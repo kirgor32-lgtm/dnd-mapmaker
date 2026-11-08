@@ -956,6 +956,11 @@
     saveHistory();
     populateAllPalettes();
     updateHistoryButtons();
+    // Set initial active terrain button
+    const firstTerrainBtn = document.querySelector('.terrain-btn');
+    if (firstTerrainBtn) {
+      firstTerrainBtn.classList.add('active');
+    }
     render();
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
