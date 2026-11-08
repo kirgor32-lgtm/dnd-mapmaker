@@ -78,7 +78,7 @@
     selectedTerrainType: 'grass',
     brushSize: 20,
     currentMode: 'town',
-    showGrid: false,
+    showGrid: true,
     snapToGrid: false,
     zoom: 1,
     panX: 0,
@@ -1413,8 +1413,8 @@
     const rect = canvas.getBoundingClientRect();
     const canvasX = e.clientX - rect.left;
     const canvasY = e.clientY - rect.top;
-    const worldX = canvasX / state.zoom - state.panX;
-    const worldY = canvasY / state.zoom - state.panY;
+    const worldX = (canvasX - state.panX) / state.zoom;
+    const worldY = (canvasY - state.panY) / state.zoom;
 
     if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
       state.panStart = { x: canvasX, y: canvasY };
@@ -1443,8 +1443,8 @@
     const rect = canvas.getBoundingClientRect();
     const canvasX = e.clientX - rect.left;
     const canvasY = e.clientY - rect.top;
-    const worldX = canvasX / state.zoom - state.panX;
-    const worldY = canvasY / state.zoom - state.panY;
+    const worldX = (canvasX - state.panX) / state.zoom;
+    const worldY = (canvasY - state.panY) / state.zoom;
 
     const { label } = pixelToGrid(worldX, worldY);
     document.getElementById('gridCoords').textContent = label;
@@ -1812,6 +1812,7 @@
     if (firstTerrainBtn) {
       firstTerrainBtn.classList.add('active');
     }
+    document.getElementById('btnGrid').classList.toggle('active', state.showGrid);
     render();
     window.addEventListener('resize', () => {
       resizeCanvasToDisplaySize();
