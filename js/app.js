@@ -19,53 +19,53 @@
 
   const PROP_LIBRARY = {
     town: [
-      { id: 'house1', name: 'Дом (коттедж)', drawIcon: drawHouseCottage },
-      { id: 'house2', name: 'Дом (камень)', drawIcon: drawHouseStone },
-      { id: 'house3', name: 'Дом (брус)', drawIcon: drawHouseTimber },
-      { id: 'house4', name: 'Дом (высокий)', drawIcon: drawHouseTall },
-      { id: 'house5', name: 'Дом (маленький)', drawIcon: drawHouseSmall },
-      { id: 'house6', name: 'Дом с забором', drawIcon: drawHouseWithFence },
-      { id: 'watchtower', name: 'Сторожевая башня', drawIcon: drawWatchtower },
-      { id: 'castle', name: 'Замок', drawIcon: drawCastle },
-      { id: 'citywall', name: 'Городская стена', drawIcon: drawCityWall },
-      { id: 'gate', name: 'Городские ворота', drawIcon: drawCityGate },
-      { id: 'market', name: 'Рынок', drawIcon: drawMarketStall },
-      { id: 'well', name: 'Колодец', drawIcon: drawWell },
-      { id: 'temple', name: 'Храм', drawIcon: drawTemple },
-      { id: 'tavern', name: 'Таверна', drawIcon: drawTavern },
-      { id: 'windmill', name: 'Мельница', drawIcon: drawWindmill },
-      { id: 'dock', name: 'Пристань', drawIcon: drawDock },
-      { id: 'farm', name: 'Ферма', drawIcon: drawFarm },
-      { id: 'fence', name: 'Забор', drawIcon: drawFence },
-      { id: 'bridge', name: 'Деревянный мост', drawIcon: drawBridge }
+      { id: 'house1', name: 'Дом (коттедж)', drawIcon: drawHouseCottage, footprint: 2 },
+      { id: 'house2', name: 'Дом (камень)', drawIcon: drawHouseStone, footprint: 2 },
+      { id: 'house3', name: 'Дом (брус)', drawIcon: drawHouseTimber, footprint: 2 },
+      { id: 'house4', name: 'Дом (высокий)', drawIcon: drawHouseTall, footprint: 2 },
+      { id: 'house5', name: 'Дом (маленький)', drawIcon: drawHouseSmall, footprint: 1 },
+      { id: 'house6', name: 'Дом с забором', drawIcon: drawHouseWithFence, footprint: 3 },
+      { id: 'watchtower', name: 'Сторожевая башня', drawIcon: drawWatchtower, footprint: 2 },
+      { id: 'castle', name: 'Замок', drawIcon: drawCastle, footprint: 5 },
+      { id: 'citywall', name: 'Городская стена', drawIcon: drawCityWall, footprint: 1 },
+      { id: 'gate', name: 'Городские ворота', drawIcon: drawCityGate, footprint: 2 },
+      { id: 'market', name: 'Рынок', drawIcon: drawMarketStall, footprint: 2 },
+      { id: 'well', name: 'Колодец', drawIcon: drawWell, footprint: 1 },
+      { id: 'temple', name: 'Храм', drawIcon: drawTemple, footprint: 3 },
+      { id: 'tavern', name: 'Таверна', drawIcon: drawTavern, footprint: 3 },
+      { id: 'windmill', name: 'Мельница', drawIcon: drawWindmill, footprint: 2 },
+      { id: 'dock', name: 'Пристань', drawIcon: drawDock, footprint: 2 },
+      { id: 'farm', name: 'Ферма', drawIcon: drawFarm, footprint: 3 },
+      { id: 'fence', name: 'Забор', drawIcon: drawFence, footprint: 1 },
+      { id: 'bridge', name: 'Деревянный мост', drawIcon: drawBridge, footprint: 2 }
     ],
     dungeon: [
-      { id: 'dwall', name: 'Каменная стена', drawIcon: drawDungeonWall },
-      { id: 'door', name: 'Дверь', drawIcon: drawDoor },
-      { id: 'sdoor', name: 'Скрытая дверь', drawIcon: drawSecretDoor },
-      { id: 'stairup', name: 'Лестница вверх', drawIcon: drawStairsUp },
-      { id: 'stairdown', name: 'Лестница вниз', drawIcon: drawStairsDown },
-      { id: 'pillar', name: 'Колонна', drawIcon: drawPillar },
-      { id: 'torch', name: 'Факел', drawIcon: drawTorch },
-      { id: 'chest', name: 'Сундук', drawIcon: drawChest },
-      { id: 'trap', name: 'Ловушка', drawIcon: drawTrap },
-      { id: 'altar', name: 'Алтарь', drawIcon: drawAltar },
-      { id: 'cage', name: 'Клетка', drawIcon: drawCage },
-      { id: 'rubble', name: 'Развалины', drawIcon: drawRubble },
-      { id: 'pit', name: 'Пропасть', drawIcon: drawPit },
-      { id: 'statue', name: 'Статуя', drawIcon: drawStatue }
+      { id: 'dwall', name: 'Каменная стена', drawIcon: drawDungeonWall, footprint: 1 },
+      { id: 'door', name: 'Дверь', drawIcon: drawDoor, footprint: 1 },
+      { id: 'sdoor', name: 'Скрытая дверь', drawIcon: drawSecretDoor, footprint: 1 },
+      { id: 'stairup', name: 'Лестница вверх', drawIcon: drawStairsUp, footprint: 1 },
+      { id: 'stairdown', name: 'Лестница вниз', drawIcon: drawStairsDown, footprint: 1 },
+      { id: 'pillar', name: 'Колонна', drawIcon: drawPillar, footprint: 1 },
+      { id: 'torch', name: 'Факел', drawIcon: drawTorch, footprint: 1 },
+      { id: 'chest', name: 'Сундук', drawIcon: drawChest, footprint: 1 },
+      { id: 'trap', name: 'Ловушка', drawIcon: drawTrap, footprint: 1 },
+      { id: 'altar', name: 'Алтарь', drawIcon: drawAltar, footprint: 2 },
+      { id: 'cage', name: 'Клетка', drawIcon: drawCage, footprint: 1 },
+      { id: 'rubble', name: 'Развалины', drawIcon: drawRubble, footprint: 1 },
+      { id: 'pit', name: 'Пропасть', drawIcon: drawPit, footprint: 1 },
+      { id: 'statue', name: 'Статуя', drawIcon: drawStatue, footprint: 1 }
     ],
     nature: [
-      { id: 'tree1', name: 'Лиственное дерево', drawIcon: drawTreeDeciduous },
-      { id: 'tree2', name: 'Хвойное дерево', drawIcon: drawTreePine },
-      { id: 'bush', name: 'Куст', drawIcon: drawBush },
-      { id: 'rock', name: 'Скальное образование', drawIcon: drawRockCluster },
-      { id: 'boulder', name: 'Валун', drawIcon: drawBoulder },
-      { id: 'flower', name: 'Цветы', drawIcon: drawFlowerPatch },
-      { id: 'pond', name: 'Пруд', drawIcon: drawPond },
-      { id: 'river', name: 'Река', drawIcon: drawRiverBend },
-      { id: 'grave', name: 'Надгробие', drawIcon: drawGravestone },
-      { id: 'campfire', name: 'Костёр', drawIcon: drawCampfire }
+      { id: 'tree1', name: 'Лиственное дерево', drawIcon: drawTreeDeciduous, footprint: 1 },
+      { id: 'tree2', name: 'Хвойное дерево', drawIcon: drawTreePine, footprint: 1 },
+      { id: 'bush', name: 'Куст', drawIcon: drawBush, footprint: 1 },
+      { id: 'rock', name: 'Скальное образование', drawIcon: drawRockCluster, footprint: 1 },
+      { id: 'boulder', name: 'Валун', drawIcon: drawBoulder, footprint: 1 },
+      { id: 'flower', name: 'Цветы', drawIcon: drawFlowerPatch, footprint: 1 },
+      { id: 'pond', name: 'Пруд', drawIcon: drawPond, footprint: 2 },
+      { id: 'river', name: 'Река', drawIcon: drawRiverBend, footprint: 2 },
+      { id: 'grave', name: 'Надгробие', drawIcon: drawGravestone, footprint: 1 },
+      { id: 'campfire', name: 'Костёр', drawIcon: drawCampfire, footprint: 1 }
     ]
   };
 
@@ -1363,20 +1363,21 @@
 
     for (let i = 0; i < state.props.length; i++) {
       const prop = state.props[i];
-      const px = prop.x * GRID_SIZE + GRID_SIZE / 2;
-      const py = prop.y * GRID_SIZE + GRID_SIZE / 2;
+      const px = prop.x;
+      const py = prop.y;
+      const propDef = findPropDefinition(prop.propId);
+      const footprint = (propDef && propDef.footprint) || 1;
 
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate((prop.rotation * Math.PI) / 180);
-      ctx.scale(prop.scale * ICON_SCALE, prop.scale * ICON_SCALE);
+      ctx.scale(prop.scale * ICON_SCALE * footprint, prop.scale * ICON_SCALE * footprint);
 
       ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
       ctx.shadowBlur = 4;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
 
-      const propDef = findPropDefinition(prop.propId);
       if (propDef && propDef.drawIcon) {
         propDef.drawIcon(ctx);
       }
@@ -1420,12 +1421,22 @@
       state.panStart = { x: canvasX, y: canvasY };
     } else if (e.button === 0) {
       if (state.selectedPropId) {
-        let gx = Math.round(worldX / GRID_SIZE);
-        let gy = Math.round(worldY / GRID_SIZE);
+        const propDef = findPropDefinition(state.selectedPropId);
+        const footprint = (propDef && propDef.footprint) || 1;
+        let px, py;
+        if (state.snapToGrid) {
+          // Привязка к сетке: якорим так, чтобы центр постройки совпал с ближайшим узлом сетки
+          px = Math.round(worldX / GRID_SIZE) * GRID_SIZE;
+          py = Math.round(worldY / GRID_SIZE) * GRID_SIZE;
+        } else {
+          // Без привязки: ставим ровно в точку клика
+          px = worldX;
+          py = worldY;
+        }
         state.props.push({
           propId: state.selectedPropId,
-          x: gx,
-          y: gy,
+          x: px,
+          y: py,
           rotation: 0,
           scale: 1
         });
@@ -1543,7 +1554,7 @@
   function duplicateSelectedProp() {
     if (state.selectedProp !== null) {
       const prop = state.props[state.selectedProp];
-      state.props.push({ ...prop, x: prop.x + 1, y: prop.y + 1 });
+      state.props.push({ ...prop, x: prop.x + GRID_SIZE, y: prop.y + GRID_SIZE });
       saveHistory();
       render();
     }
@@ -1679,13 +1690,14 @@
     }
 
     for (const prop of state.props) {
-      const px = prop.x * GRID_SIZE + GRID_SIZE / 2;
-      const py = prop.y * GRID_SIZE + GRID_SIZE / 2;
+      const px = prop.x;
+      const py = prop.y;
+      const propDef = findPropDefinition(prop.propId);
+      const footprint = (propDef && propDef.footprint) || 1;
       exportCtx.save();
       exportCtx.translate(px, py);
       exportCtx.rotate((prop.rotation * Math.PI) / 180);
-      exportCtx.scale(prop.scale * ICON_SCALE, prop.scale * ICON_SCALE);
-      const propDef = findPropDefinition(prop.propId);
+      exportCtx.scale(prop.scale * ICON_SCALE * footprint, prop.scale * ICON_SCALE * footprint);
       if (propDef && propDef.drawIcon) {
         propDef.drawIcon(exportCtx);
       }
