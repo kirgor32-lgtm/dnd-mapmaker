@@ -93,70 +93,156 @@
   const fileInput = document.getElementById('fileInput');
 
   // Town buildings - detailed top-down views
+  // ===== TOWN BUILDINGS - Detailed Top-Down Views =====
+  
   function drawHouseCottage(ctx) {
-    ctx.fillStyle = '#8b4513';
+    // Крыша с градиентом - красная черепица
+    const roofGrad = ctx.createLinearGradient(0, -12, 0, -6);
+    roofGrad.addColorStop(0, '#d43333');
+    roofGrad.addColorStop(0.5, '#cc1111');
+    roofGrad.addColorStop(1, '#991111');
+    ctx.fillStyle = roofGrad;
     ctx.beginPath();
-    ctx.moveTo(-9, -6);
-    ctx.quadraticCurveTo(0, -12, 9, -6);
-    ctx.lineTo(8, -5);
-    ctx.quadraticCurveTo(0, -10, -8, -5);
-    ctx.fill();
-    ctx.fillStyle = '#a0522d';
-    ctx.fillRect(-9, -6, 18, 2);
-    ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-8, -4, 16, 10);
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-8, -4, 16, 10);
-    ctx.fillStyle = '#5c4a2f';
-    ctx.fillRect(-2, 3, 4, 4);
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(-6, 0, 3, 2.5);
-    ctx.fillRect(3, 0, 3, 2.5);
-  }
-
-  function drawHouseStone(ctx) {
-    ctx.fillStyle = '#808080';
-    ctx.beginPath();
-    ctx.moveTo(-10, -8);
-    ctx.lineTo(10, -8);
-    ctx.lineTo(9, -5);
-    ctx.lineTo(-9, -5);
-    ctx.fill();
-    ctx.fillStyle = '#696969';
-    ctx.beginPath();
-    ctx.moveTo(-10, -8);
-    ctx.quadraticCurveTo(0, -14, 10, -8);
+    ctx.moveTo(-10, -6);
+    ctx.quadraticCurveTo(0, -14, 10, -6);
     ctx.lineTo(9, -5);
     ctx.quadraticCurveTo(0, -11, -9, -5);
     ctx.fill();
-    ctx.fillStyle = '#b0b0b0';
-    ctx.fillRect(-9, -4, 18, 12);
+    
+    // Тень крыши
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(-9, -5);
+    ctx.lineTo(9, -5);
+    ctx.lineTo(8, -4);
+    ctx.lineTo(-8, -4);
+    ctx.fill();
+    
+    // Стены - камень/кирпич с градиентом
+    const wallGrad = ctx.createLinearGradient(-8, -4, 8, 6);
+    wallGrad.addColorStop(0, '#c9a876');
+    wallGrad.addColorStop(0.5, '#deb89b');
+    wallGrad.addColorStop(1, '#c9a876');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-9, -4, 18, 10);
+    
+    // Контур стен
+    ctx.strokeStyle = '#8b7355';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-9, -4, 18, 10);
+    
+    // Текстура кирпичей
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
     for (let i = -8; i <= 8; i += 6) {
-      for (let j = -2; j <= 6; j += 4) {
-        ctx.fillStyle = '#999999';
-        ctx.fillRect(i, j, 2.5, 2.5);
-      }
+      ctx.fillRect(i, -2, 5, 1);
+      ctx.fillRect(i, 2, 5, 1);
     }
+    
+    // Дверь
+    ctx.fillStyle = '#5c3a1f';
+    ctx.fillRect(-2, 2, 4, 5);
+    ctx.fillStyle = '#f4a460';
+    ctx.fillRect(-0.5, 3.5, 1, 1.5);
+    
+    // Окна
+    ctx.fillStyle = '#87ceeb';
+    ctx.fillRect(-6, -1, 3, 2.5);
+    ctx.fillRect(3, -1, 3, 2.5);
+    ctx.fillStyle = '#4a90e2';
+    ctx.fillRect(-5.5, -0.5, 1.5, 1.5);
+    ctx.fillRect(3.5, -0.5, 1.5, 1.5);
   }
-
+  
+  function drawHouseStone(ctx) {
+    // Крыша - серо-синяя черепица
+    const roofGrad = ctx.createLinearGradient(0, -14, 0, -6);
+    roofGrad.addColorStop(0, '#5a7c8d');
+    roofGrad.addColorStop(0.5, '#4a5c6f');
+    roofGrad.addColorStop(1, '#2a3c4f');
+    ctx.fillStyle = roofGrad;
+    ctx.beginPath();
+    ctx.moveTo(-11, -7);
+    ctx.quadraticCurveTo(0, -15, 11, -7);
+    ctx.lineTo(10, -5);
+    ctx.quadraticCurveTo(0, -12, -10, -5);
+    ctx.fill();
+    
+    // Тень крыши
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.moveTo(-10, -5);
+    ctx.lineTo(10, -5);
+    ctx.lineTo(9, -3);
+    ctx.lineTo(-9, -3);
+    ctx.fill();
+    
+    // Каменные стены с градиентом
+    const stoneGrad = ctx.createLinearGradient(-9, -2, 9, 8);
+    stoneGrad.addColorStop(0, '#a0a0a0');
+    stoneGrad.addColorStop(0.5, '#b8b8b8');
+    stoneGrad.addColorStop(1, '#9a9a9a');
+    ctx.fillStyle = stoneGrad;
+    ctx.fillRect(-10, -3, 20, 11);
+    
+    // Контур
+    ctx.strokeStyle = '#6a6a6a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-10, -3, 20, 11);
+    
+    // Кладка камней
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 0.5;
+    for (let i = -8; i <= 8; i += 7) {
+      ctx.beginPath();
+      ctx.moveTo(i, -2);
+      ctx.lineTo(i + 6, -2);
+      ctx.stroke();
+    }
+    for (let j = 0; j <= 8; j += 3) {
+      ctx.beginPath();
+      ctx.moveTo(-10, j);
+      ctx.lineTo(10, j);
+      ctx.stroke();
+    }
+    
+    // Двери и окна
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillRect(-3, 1, 6, 6);
+    ctx.fillStyle = '#5a7c8d';
+    ctx.fillRect(-2, 2, 2.5, 2);
+    ctx.fillRect(1.5, 2, 2.5, 2);
+  }
+  
   function drawHouseTimber(ctx) {
-    ctx.fillStyle = '#8b4513';
+    // Крыша - тёмная
+    ctx.fillStyle = '#8b6f47';
     ctx.beginPath();
     ctx.moveTo(-10, -7);
     ctx.lineTo(0, -13);
     ctx.lineTo(10, -7);
     ctx.fill();
-    ctx.fillStyle = '#a0522d';
-    ctx.beginPath();
-    ctx.moveTo(-10, -7);
-    ctx.lineTo(0, -11);
-    ctx.lineTo(10, -7);
-    ctx.fill();
-    ctx.fillStyle = '#f5deb3';
+    
+    // Шинглы на крыше
+    ctx.fillStyle = '#6b5340';
+    for (let i = -10; i <= 10; i += 4) {
+      for (let j = -11; j <= -7; j += 2) {
+        ctx.beginPath();
+        ctx.arc(i + 2, j, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    // Стены - светлое дерево с градиентом
+    const woodGrad = ctx.createLinearGradient(-8, -5, 8, 7);
+    woodGrad.addColorStop(0, '#d4b499');
+    woodGrad.addColorStop(0.5, '#e8c9a8');
+    woodGrad.addColorStop(1, '#d4b499');
+    ctx.fillStyle = woodGrad;
     ctx.fillRect(-9, -5, 18, 12);
+    
+    // Балки - горизонтальные и вертикальные
     ctx.strokeStyle = '#8b4513';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(-9, 0);
     ctx.lineTo(9, 0);
@@ -165,753 +251,1019 @@
     ctx.moveTo(0, -5);
     ctx.lineTo(0, 7);
     ctx.stroke();
-    ctx.fillStyle = '#6b5340';
-    ctx.fillRect(-2, 2, 4, 5);
-  }
-
-  function drawHouseTall(ctx) {
-    ctx.fillStyle = '#cc3333';
-    ctx.beginPath();
-    ctx.moveTo(-8, -8);
-    ctx.lineTo(0, -15);
-    ctx.lineTo(8, -8);
-    ctx.fill();
-    ctx.fillStyle = '#8b2222';
-    ctx.beginPath();
-    ctx.moveTo(-8, -8);
-    ctx.quadraticCurveTo(0, -14, 8, -8);
-    ctx.fill();
-    ctx.fillStyle = '#d9b48f';
-    ctx.fillRect(-7, -6, 14, 14);
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-7, -6, 14, 14);
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(-5, -2, 3, 2.5);
-    ctx.fillRect(2, -2, 3, 2.5);
-    ctx.fillRect(-5, 2, 3, 2.5);
-    ctx.fillRect(2, 2, 3, 2.5);
-  }
-
-  function drawHouseSmall(ctx) {
-    ctx.fillStyle = '#b83333';
-    ctx.beginPath();
-    ctx.moveTo(-6, -4);
-    ctx.lineTo(0, -8);
-    ctx.lineTo(6, -4);
-    ctx.fill();
+    
+    // Дверь
+    ctx.fillStyle = '#5c3a1f';
+    ctx.fillRect(-2.5, 3, 5, 4);
     ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-6, -3, 12, 8);
+    ctx.fillRect(-1, 4.5, 2, 1.5);
+  }
+  
+  function drawHouseTall(ctx) {
+    // Высокий красный дом с четырёхскатной крышей
+    const roofGrad = ctx.createLinearGradient(0, -15, 0, -6);
+    roofGrad.addColorStop(0, '#ff4444');
+    roofGrad.addColorStop(0.5, '#dd2222');
+    roofGrad.addColorStop(1, '#aa1111');
+    ctx.fillStyle = roofGrad;
+    ctx.beginPath();
+    ctx.moveTo(-9, -8);
+    ctx.lineTo(0, -16);
+    ctx.lineTo(9, -8);
+    ctx.lineTo(8, -6);
+    ctx.quadraticCurveTo(0, -12, -8, -6);
+    ctx.fill();
+    
+    // Стены с окнами
+    const wallGrad = ctx.createLinearGradient(-8, -4, 8, 6);
+    wallGrad.addColorStop(0, '#deb89b');
+    wallGrad.addColorStop(1, '#c9a876');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-8, -4, 16, 14);
     ctx.strokeStyle = '#8b6f47';
     ctx.lineWidth = 1;
-    ctx.strokeRect(-6, -3, 12, 8);
-    ctx.fillStyle = '#6b5340';
-    ctx.fillRect(-1.5, 1, 3, 3);
+    ctx.strokeRect(-8, -4, 16, 14);
+    
+    // Окна - 2x2
+    ctx.fillStyle = '#87ceeb';
+    ctx.fillRect(-5, -2, 3, 3);
+    ctx.fillRect(2, -2, 3, 3);
+    ctx.fillRect(-5, 3, 3, 3);
+    ctx.fillRect(2, 3, 3, 3);
+    
+    // Отражения в окнах
+    ctx.fillStyle = '#4a90e2';
+    ctx.fillRect(-4.5, -1, 1, 1);
+    ctx.fillRect(2.5, -1, 1, 1);
   }
-
+  
+  function drawHouseSmall(ctx) {
+    // Маленький коттедж
+    const roofGrad = ctx.createLinearGradient(0, -8, 0, -4);
+    roofGrad.addColorStop(0, '#b83333');
+    roofGrad.addColorStop(1, '#8a1111');
+    ctx.fillStyle = roofGrad;
+    ctx.beginPath();
+    ctx.moveTo(-7, -4);
+    ctx.lineTo(0, -9);
+    ctx.lineTo(7, -4);
+    ctx.fill();
+    
+    const wallGrad = ctx.createLinearGradient(-6, -3, 6, 5);
+    wallGrad.addColorStop(0, '#d4a574');
+    wallGrad.addColorStop(1, '#c9a876');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-7, -3, 14, 8);
+    ctx.strokeStyle = '#8b6f47';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-7, -3, 14, 8);
+    
+    // Дверь и окно
+    ctx.fillStyle = '#3a2a1a';
+    ctx.fillRect(-1.5, 1, 3, 3);
+    ctx.fillStyle = '#87ceeb';
+    ctx.fillRect(3, 0, 2, 2);
+  }
+  
   function drawHouseWithFence(ctx) {
+    // Дом с забором
     ctx.fillStyle = '#cc3333';
     ctx.beginPath();
-    ctx.moveTo(-8, -6);
+    ctx.moveTo(-8, -5);
     ctx.lineTo(0, -11);
-    ctx.lineTo(8, -6);
+    ctx.lineTo(8, -5);
     ctx.fill();
+    
     ctx.fillStyle = '#d4a574';
     ctx.fillRect(-8, -4, 16, 10);
     ctx.strokeStyle = '#8b6f47';
     ctx.lineWidth = 1;
     ctx.strokeRect(-8, -4, 16, 10);
-    ctx.fillStyle = '#5c4a2f';
-    ctx.fillRect(-2, 3, 4, 3);
+    
+    // Дверь
+    ctx.fillStyle = '#5c3a1f';
+    ctx.fillRect(-2, 2, 4, 3);
+    
+    // Забор - снизу
     ctx.strokeStyle = '#8b6f47';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(-12, 6);
-    ctx.lineTo(12, 6);
+    ctx.moveTo(-14, 6);
+    ctx.lineTo(14, 6);
     ctx.stroke();
-    for (let i = -10; i <= 10; i += 4) {
-      ctx.beginPath();
-      ctx.moveTo(i, 6);
-      ctx.lineTo(i, 3);
-      ctx.stroke();
+    
+    // Штакетины
+    for (let i = -12; i <= 12; i += 4) {
+      ctx.fillStyle = '#a0826d';
+      ctx.fillRect(i, 4, 2, 3);
     }
   }
-
+  
   function drawWatchtower(ctx) {
-    ctx.fillStyle = '#999999';
-    ctx.beginPath();
-    ctx.arc(0, 0, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#696969';
-    ctx.beginPath();
-    ctx.arc(0, 0, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#999999';
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2;
-      const x = Math.cos(a) * 8;
-      const y = Math.sin(a) * 8;
-      ctx.fillRect(x - 1, y - 1, 2, 2);
-    }
-  }
-
-  function drawCastle(ctx) {
-    ctx.fillStyle = '#a9a9a9';
-    ctx.fillRect(-12, -8, 24, 16);
-    ctx.strokeStyle = '#696969';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-12, -8, 24, 16);
-    ctx.fillStyle = '#808080';
-    ctx.fillRect(-14, -10, 4, 5);
-    ctx.fillRect(10, -10, 4, 5);
-    ctx.fillRect(-14, 6, 4, 4);
-    ctx.fillRect(10, 6, 4, 4);
-    ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-10, -6, 20, 12);
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-4, -4, 8, 8);
-  }
-
-  function drawCityWall(ctx) {
-    ctx.fillStyle = '#a0a0a0';
-    ctx.fillRect(-12, -2, 24, 8);
-    ctx.strokeStyle = '#696969';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-12, -2, 24, 8);
-    for (let i = -8; i <= 8; i += 5) {
-      ctx.fillStyle = '#808080';
-      ctx.fillRect(i, -4, 3, 2);
-    }
-  }
-
-  function drawCityGate(ctx) {
-    ctx.fillStyle = '#b0b0b0';
-    ctx.fillRect(-11, -8, 22, 16);
-    ctx.strokeStyle = '#696969';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-11, -8, 22, 16);
-    ctx.fillStyle = '#4a3728';
-    ctx.fillRect(-6, -4, 12, 8);
-    ctx.strokeStyle = '#2a2a2a';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      ctx.moveTo(-6, -4 + i * 2);
-      ctx.lineTo(6, -4 + i * 2);
-      ctx.stroke();
-    }
-  }
-
-  function drawMarketStall(ctx) {
-    ctx.fillStyle = '#cc3333';
-    ctx.beginPath();
-    ctx.moveTo(-9, -4);
-    ctx.lineTo(0, -8);
-    ctx.lineTo(9, -4);
-    ctx.fill();
-    ctx.fillStyle = '#8b2222';
-    ctx.beginPath();
-    ctx.moveTo(-9, -4);
-    ctx.quadraticCurveTo(0, -6, 9, -4);
-    ctx.fill();
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-9, -2, 18, 8);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-9, -2, 18, 8);
-    ctx.fillStyle = '#ff6633';
-    ctx.fillRect(-7, 0, 4, 2);
-    ctx.fillStyle = '#33cc66';
-    ctx.fillRect(-2, 0, 4, 2);
-    ctx.fillStyle = '#3366ff';
-    ctx.fillRect(3, 0, 4, 2);
-  }
-
-  function drawWell(ctx) {
-    ctx.fillStyle = '#a0a0a0';
+    // Сторожевая башня - круглая со стрельницами
+    const towerGrad = ctx.createRadialGradient(0, -1, 2, 0, 0, 10);
+    towerGrad.addColorStop(0, '#a9a9a9');
+    towerGrad.addColorStop(1, '#7a7a7a');
+    ctx.fillStyle = towerGrad;
     ctx.beginPath();
     ctx.arc(0, 0, 9, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#999999';
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const x = Math.cos(a) * 7;
-      const y = Math.sin(a) * 7;
-      ctx.fillRect(x - 1, y - 1, 2, 2);
+    
+    // Контур
+    ctx.strokeStyle = '#5a5a5a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, 0, 9, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Стрельницы
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const x = Math.cos(a) * 10;
+      const y = Math.sin(a) * 10;
+      ctx.fillStyle = '#3a3a3a';
+      ctx.fillRect(x - 2, y - 1.5, 4, 3);
     }
-    ctx.fillStyle = '#1e5a96';
+    
+    // Крыша - конус сверху
+    const roofGrad = ctx.createRadialGradient(0, -5, 0, 0, 0, 15);
+    roofGrad.addColorStop(0, '#d4a574');
+    roofGrad.addColorStop(1, '#8b7355');
+    ctx.fillStyle = roofGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2d7ab8';
-    ctx.beginPath();
-    ctx.arc(0, -1, 2, 0, Math.PI * 2);
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  function drawTemple(ctx) {
-    ctx.fillStyle = '#f5f5dc';
+  
+  function drawCastle(ctx) {
+    // Замок с четырьмя башнями
+    // Основная часть
+    const wallGrad = ctx.createLinearGradient(-12, -8, 12, 8);
+    wallGrad.addColorStop(0, '#9a9a9a');
+    wallGrad.addColorStop(0.5, '#b0b0b0');
+    wallGrad.addColorStop(1, '#8a8a8a');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-12, -6, 24, 12);
+    
+    // Башни по углам
+    ctx.fillStyle = '#7a7a7a';
+    ctx.fillRect(-15, -8, 5, 8);
+    ctx.fillRect(10, -8, 5, 8);
+    ctx.fillRect(-15, 2, 5, 6);
+    ctx.fillRect(10, 2, 5, 6);
+    
+    // Крыши башен
+    ctx.fillStyle = '#5a5a5a';
+    ctx.beginPath();
+    ctx.moveTo(-15, -8);
+    ctx.lineTo(-12.5, -10);
+    ctx.lineTo(-10, -8);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(10, -8);
+    ctx.lineTo(12.5, -10);
+    ctx.lineTo(15, -8);
+    ctx.fill();
+    
+    // Главные ворота
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillRect(-6, -4, 12, 8);
+    ctx.fillStyle = '#d4a574';
+    ctx.fillRect(-4, -2, 8, 4);
+  }
+  
+  function drawCityWall(ctx) {
+    // Городская стена с зубцами
+    ctx.fillStyle = '#a0a0a0';
+    ctx.fillRect(-13, -1, 26, 6);
+    ctx.strokeStyle = '#6a6a6a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-13, -1, 26, 6);
+    
+    // Зубцы сверху
+    for (let i = -10; i <= 10; i += 5) {
+      ctx.fillStyle = '#8a8a8a';
+      ctx.fillRect(i, -3, 3, 2);
+    }
+  }
+  
+  function drawCityGate(ctx) {
+    // Массивные городские ворота
+    ctx.fillStyle = '#b0b0b0';
     ctx.fillRect(-10, -7, 20, 14);
-    ctx.strokeStyle = '#a9a9a9';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#6a6a6a';
+    ctx.lineWidth = 1;
     ctx.strokeRect(-10, -7, 20, 14);
-    ctx.fillStyle = '#daa520';
+    
+    // Ворота - две створки
+    ctx.fillStyle = '#3a2a1a';
+    ctx.fillRect(-8, -5, 8, 10);
+    ctx.fillRect(0, -5, 8, 10);
+    
+    // Кольца на воротах
+    ctx.strokeStyle = '#d4a574';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(-10, -7);
-    ctx.lineTo(0, -12);
-    ctx.lineTo(10, -7);
-    ctx.fill();
-    ctx.fillStyle = '#c0c0c0';
-    ctx.fillRect(-8, -5, 2, 2);
-    ctx.fillRect(6, -5, 2, 2);
-    ctx.fillRect(-8, 5, 2, 2);
-    ctx.fillRect(6, 5, 2, 2);
-    ctx.fillStyle = '#daa520';
-    ctx.fillRect(-3, -2, 6, 4);
+    ctx.arc(-4, 0, 1.5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(4, 0, 1.5, 0, Math.PI * 2);
+    ctx.stroke();
   }
-
-  function drawTavern(ctx) {
+  
+  function drawMarketStall(ctx) {
+    // Рыночный навес - палатка сверху
+    const tentGrad = ctx.createLinearGradient(-10, -8, 10, 0);
+    tentGrad.addColorStop(0, '#d4a51a');
+    tentGrad.addColorStop(0.5, '#ffcc33');
+    tentGrad.addColorStop(1, '#d4a51a');
+    ctx.fillStyle = tentGrad;
+    ctx.beginPath();
+    ctx.moveTo(-11, 0);
+    ctx.lineTo(0, -10);
+    ctx.lineTo(11, 0);
+    ctx.fill();
+    
+    // Каркас палатки
+    ctx.strokeStyle = '#8b6f47';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-11, 0);
+    ctx.lineTo(0, -10);
+    ctx.lineTo(11, 0);
+    ctx.stroke();
+    
+    // Столы снизу
+    ctx.fillStyle = '#a0826d';
+    ctx.fillRect(-10, 1, 8, 6);
+    ctx.fillRect(2, 1, 8, 6);
+    
+    // Товары
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fillRect(-8, 2, 3, 2);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillRect(-3, 2, 3, 2);
+  }
+  
+  function drawWell(ctx) {
+    // Колодец
+    const stoneGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 8);
+    stoneGrad.addColorStop(0, '#a0a0a0');
+    stoneGrad.addColorStop(1, '#6a6a6a');
+    ctx.fillStyle = stoneGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Контур кольца
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Крышка сверху
     ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-10, -6, 20, 12);
+    ctx.fillRect(-6, -2, 12, 2);
     ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-10, -6, 20, 12);
-    ctx.fillStyle = '#cc3333';
-    ctx.beginPath();
-    ctx.moveTo(-10, -6);
-    ctx.lineTo(0, -11);
-    ctx.lineTo(10, -6);
-    ctx.fill();
-    ctx.fillStyle = '#ffff99';
-    ctx.fillRect(-7, -1, 3, 2.5);
-    ctx.fillRect(4, -1, 3, 2.5);
-    ctx.fillRect(-7, 3, 3, 2.5);
-    ctx.fillRect(4, 3, 3, 2.5);
-  }
-
-  function drawWindmill(ctx) {
-    ctx.fillStyle = '#999999';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-6, -2, 12, 2);
+    
+    // Внутри видна вода
+    ctx.fillStyle = 'rgba(30, 144, 255, 0.4)';
     ctx.beginPath();
     ctx.arc(0, 0, 6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#696969';
+  }
+  
+  function drawTemple(ctx) {
+    // Храм - крестообразный
+    ctx.fillStyle = '#e8d7c3';
+    ctx.fillRect(-4, -11, 8, 12);
+    ctx.fillRect(-11, -4, 22, 8);
+    
+    // Крыша-купол
+    ctx.fillStyle = '#d4af37';
     ctx.beginPath();
-    ctx.arc(0, 0, 5, 0, Math.PI * 2);
+    ctx.arc(0, -11, 6, 0, Math.PI * 2);
     ctx.fill();
+    
+    // Контур купола
+    ctx.strokeStyle = '#a0821d';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, -11, 6, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Колонны
+    ctx.fillStyle = '#a0826d';
+    ctx.fillRect(-8, -3, 2, 6);
+    ctx.fillRect(-4, -3, 2, 6);
+    ctx.fillRect(2, -3, 2, 6);
+    ctx.fillRect(6, -3, 2, 6);
+  }
+  
+  function drawTavern(ctx) {
+    // Таверна - дом с вывеской
     ctx.fillStyle = '#8b4513';
     ctx.beginPath();
-    ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+    ctx.moveTo(-9, -6);
+    ctx.lineTo(0, -12);
+    ctx.lineTo(9, -6);
     ctx.fill();
-    ctx.fillStyle = '#e0e0e0';
-    ctx.fillRect(-5, -1, 10, 2);
-    ctx.fillRect(-1, -5, 2, 10);
+    
+    ctx.fillStyle = '#d9b99f';
+    ctx.fillRect(-9, -4, 18, 11);
+    ctx.strokeStyle = '#8b6f47';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-9, -4, 18, 11);
+    
+    // Дверь с табличкой
+    ctx.fillStyle = '#5c3a1f';
+    ctx.fillRect(-2, 2, 4, 5);
+    
+    // Вывеска сверху
+    ctx.fillStyle = '#cc3333';
+    ctx.fillRect(-4, -7, 8, 2);
   }
-
-  function drawDock(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-12, -2, 24, 4);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-12, -2, 24, 4);
-    ctx.fillStyle = '#6b5a3d';
-    for (let i = -10; i <= 10; i += 7) {
-      ctx.fillRect(i - 0.5, 2, 1, 4);
-    }
-    ctx.strokeStyle = '#1e5a96';
-    ctx.lineWidth = 1;
+  
+  function drawWindmill(ctx) {
+    // Мельница - тело + лопасти
+    ctx.fillStyle = '#a0826d';
     ctx.beginPath();
-    ctx.arc(0, 8, 5, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.arc(0, 2, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Лопасти
+    ctx.fillStyle = '#e8c9a8';
+    ctx.fillRect(-1, -10, 2, 12);
+    ctx.fillRect(-10, 1, 20, 2);
+    
+    // Тень на лопастях
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillRect(-0.5, -8, 1, 8);
+    ctx.fillRect(-8, 1.5, 16, 1);
   }
-
+  
+  function drawDock(ctx) {
+    // Пристань - доки/причалы
+    ctx.fillStyle = '#8b6f47';
+    ctx.fillRect(-10, -2, 20, 4);
+    ctx.fillStyle = '#a0826d';
+    ctx.fillRect(-10, 2, 20, 4);
+    
+    // Столбы
+    ctx.fillStyle = '#5c4a2f';
+    ctx.fillRect(-8, -1, 1.5, 8);
+    ctx.fillRect(-2, -1, 1.5, 8);
+    ctx.fillRect(5, -1, 1.5, 8);
+    
+    // Вода
+    ctx.fillStyle = 'rgba(30, 144, 255, 0.3)';
+    ctx.fillRect(-12, 6, 24, 2);
+  }
+  
   function drawFarm(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-12, -8, 24, 16);
-    ctx.strokeStyle = '#4db876';
-    ctx.lineWidth = 2;
-    for (let i = -10; i <= 10; i += 3) {
-      ctx.beginPath();
-      ctx.moveTo(i, -6);
-      ctx.lineTo(i, 6);
-      ctx.stroke();
+    // Ферма - сарай + огород
+    ctx.fillStyle = '#cc3333';
+    ctx.beginPath();
+    ctx.moveTo(-8, -5);
+    ctx.lineTo(0, -11);
+    ctx.lineTo(8, -5);
+    ctx.fill();
+    
+    ctx.fillStyle = '#e8c9a8';
+    ctx.fillRect(-8, -4, 16, 10);
+    
+    // Огород сбоку
+    ctx.strokeStyle = '#6b5340';
+    ctx.lineWidth = 0.5;
+    for (let i = -6; i <= 6; i += 2) {
+      for (let j = 2; j <= 6; j += 2) {
+        ctx.fillStyle = '#4db876';
+        ctx.fillRect(i + 6, j, 1.5, 1.5);
+      }
     }
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-12, -8, 24, 16);
   }
-
+  
   function drawFence(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-12, -1, 24, 2);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1;
+    // Просто забор - горизонтальные доски со штакетинами
+    ctx.strokeStyle = '#8b6f47';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-12, -2);
+    ctx.lineTo(12, -2);
     ctx.stroke();
-    ctx.fillStyle = '#6b5a3d';
-    for (let i = -10; i <= 10; i += 4) {
-      ctx.fillRect(i - 1, -4, 2, 6);
+    ctx.beginPath();
+    ctx.moveTo(-12, 2);
+    ctx.lineTo(12, 2);
+    ctx.stroke();
+    
+    // Штакетины
+    ctx.fillStyle = '#a0826d';
+    for (let i = -10; i <= 10; i += 3) {
+      ctx.fillRect(i, -3, 2, 6);
     }
   }
-
+  
   function drawBridge(ctx) {
+    // Деревянный мост
     ctx.fillStyle = '#8b6f47';
     ctx.fillRect(-11, -2, 22, 4);
+    
+    // Доски моста
     ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-11, -2, 22, 4);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1;
-    for (let i = -8; i <= 8; i += 3) {
+    ctx.lineWidth = 0.5;
+    for (let i = -10; i <= 10; i += 4) {
       ctx.beginPath();
       ctx.moveTo(i, -2);
       ctx.lineTo(i, 2);
       ctx.stroke();
     }
-    ctx.fillStyle = '#6b5a3d';
-    ctx.fillRect(-10, 2, 1.5, 4);
-    ctx.fillRect(-2, 2, 1.5, 4);
-    ctx.fillRect(6, 2, 1.5, 4);
+    
+    // Тросы/опоры
+    ctx.strokeStyle = '#a0826d';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-11, -2);
+    ctx.lineTo(-9, -6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(11, -2);
+    ctx.lineTo(9, -6);
+    ctx.stroke();
   }
-
+  
+  // ===== DUNGEON PROPS - Dark, Cold, Stone & Iron =====
+  
   function drawDungeonWall(ctx) {
-    ctx.fillStyle = '#808080';
-    ctx.fillRect(-10, -5, 20, 10);
-    ctx.strokeStyle = '#4a4a4a';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-10, -5, 20, 10);
-    for (let i = -8; i <= 8; i += 5) {
-      for (let j = -3; j <= 3; j += 4) {
-        ctx.fillStyle = '#6a6a6a';
-        ctx.fillRect(i, j, 3, 2);
-      }
-    }
+    // Каменная стена
+    const wallGrad = ctx.createLinearGradient(-10, -8, 10, 8);
+    wallGrad.addColorStop(0, '#8a8a8a');
+    wallGrad.addColorStop(0.5, '#6a6a6a');
+    wallGrad.addColorStop(1, '#4a4a4a');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-11, -8, 22, 16);
+    
+    // Трещины
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-10, -6);
+    ctx.lineTo(8, 4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-5, -8);
+    ctx.lineTo(-3, 6);
+    ctx.stroke();
   }
-
+  
   function drawDoor(ctx) {
-    ctx.fillStyle = '#6b5340';
-    ctx.fillRect(-6, -9, 12, 13);
-    ctx.strokeStyle = '#4a3728';
+    // Деревянная дверь
+    ctx.fillStyle = '#5c3a1f';
+    ctx.fillRect(-7, -8, 14, 16);
+    ctx.strokeStyle = '#3a2a1f';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(-6, -9, 12, 13);
-    ctx.fillStyle = '#696969';
-    ctx.fillRect(-5, -7, 10, 1.5);
-    ctx.fillRect(-5, 4, 10, 1.5);
-    ctx.fillStyle = '#daa520';
-    ctx.beginPath();
-    ctx.arc(6, -2, 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawSecretDoor(ctx) {
-    ctx.fillStyle = '#7a7a7a';
-    ctx.fillRect(-6, -9, 12, 13);
-    ctx.strokeStyle = '#4a4a4a';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-6, -9, 12, 13);
-    ctx.strokeStyle = '#555555';
+    ctx.strokeRect(-7, -8, 14, 16);
+    
+    // Дверные планки
+    ctx.strokeStyle = '#3a2a1f';
     ctx.lineWidth = 0.5;
-    for (let j = -7; j <= 3; j += 4) {
-      ctx.beginPath();
-      ctx.moveTo(-4, j);
-      ctx.lineTo(4, j);
-      ctx.stroke();
-    }
-  }
-
-  function drawStairsUp(ctx) {
-    ctx.fillStyle = '#808080';
-    ctx.strokeStyle = '#4a4a4a';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 3; i++) {
-      const x = -5 + i * 5;
-      const y = -5 + i * 5;
-      ctx.fillRect(x, y, 4, 4);
-      ctx.strokeRect(x, y, 4, 4);
-    }
-  }
-
-  function drawStairsDown(ctx) {
-    ctx.fillStyle = '#808080';
-    ctx.strokeStyle = '#4a4a4a';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 3; i++) {
-      const x = -5 + i * 5;
-      const y = 5 - i * 5;
-      ctx.fillRect(x, y - 4, 4, 4);
-      ctx.strokeRect(x, y - 4, 4, 4);
-    }
-  }
-
-  function drawPillar(ctx) {
-    ctx.fillStyle = '#909090';
     ctx.beginPath();
-    ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#707070';
-    ctx.beginPath();
-    ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#808080';
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2;
-      const x = Math.cos(a) * 5;
-      const y = Math.sin(a) * 5;
-      ctx.fillRect(x - 1, y - 1, 2, 2);
-    }
-  }
-
-  function drawTorch(ctx) {
-    ctx.fillStyle = '#696969';
-    ctx.beginPath();
-    ctx.arc(0, 0, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#555555';
-    ctx.fillRect(-4, -1, 8, 2);
-    ctx.fillStyle = '#ff8800';
-    ctx.beginPath();
-    ctx.arc(0, -4, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#ffaa00';
-    ctx.beginPath();
-    ctx.arc(0, -5, 1.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawChest(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-8, -3, 16, 8);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-8, -3, 16, 8);
-    ctx.fillStyle = '#9b7f57';
-    ctx.beginPath();
-    ctx.arc(0, -4, 8, Math.PI, 0, false);
-    ctx.fill();
-    ctx.fillStyle = '#daa520';
-    ctx.fillRect(-8, 2, 16, 1.5);
-    ctx.fillStyle = '#696969';
-    ctx.beginPath();
-    ctx.arc(0, 3, 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawTrap(ctx) {
-    ctx.strokeStyle = '#ff0000';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(-7, -7);
-    ctx.lineTo(7, 7);
+    ctx.moveTo(-7, -4);
+    ctx.lineTo(7, -4);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(7, -7);
-    ctx.lineTo(-7, 7);
-    ctx.stroke();
-    ctx.strokeStyle = '#ff6600';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(-8, -8, 16, 16);
-  }
-
-  function drawAltar(ctx) {
-    ctx.fillStyle = '#a0a0a0';
-    ctx.fillRect(-9, 1, 18, 9);
-    ctx.strokeStyle = '#696969';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-9, 1, 18, 9);
-    ctx.fillStyle = '#888888';
-    ctx.fillRect(-7, -3, 14, 4);
-    ctx.fillStyle = '#daa520';
-    ctx.beginPath();
-    ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#b8860b';
-    ctx.beginPath();
-    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawCage(ctx) {
-    ctx.fillStyle = '#696969';
-    ctx.fillRect(-8, -10, 16, 16);
-    ctx.strokeStyle = '#333333';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-8, -10, 16, 16);
-    ctx.fillStyle = '#555555';
-    for (let i = -6; i <= 6; i += 3) {
-      ctx.fillRect(i - 0.5, -9, 1, 14);
-    }
-    for (let j = -7; j <= 5; j += 4) {
-      ctx.fillRect(-7, j, 14, 1);
-    }
-  }
-
-  function drawRubble(ctx) {
-    ctx.fillStyle = '#808080';
-    ctx.fillRect(-9, -6, 7, 8);
-    ctx.fillRect(2, -4, 8, 8);
-    ctx.fillRect(-3, 4, 6, 5);
-    ctx.strokeStyle = '#5a5a5a';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(-8, -4);
-    ctx.lineTo(-2, 2);
+    ctx.moveTo(-7, 0);
+    ctx.lineTo(7, 0);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(4, 0);
-    ctx.lineTo(2, 6);
+    ctx.moveTo(-7, 4);
+    ctx.lineTo(7, 4);
     ctx.stroke();
-  }
-
-  function drawPit(ctx) {
-    ctx.fillStyle = '#1a1a1a';
-    ctx.beginPath();
-    ctx.arc(0, 0, 11, 0, Math.PI * 2);
-    ctx.fill();
+    
+    // Замочная скважина
     ctx.fillStyle = '#333333';
-    ctx.beginPath();
-    ctx.arc(0, 0, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#555555';
-    ctx.beginPath();
-    ctx.arc(0, 0, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#1a1a1a';
-    ctx.beginPath();
-    ctx.arc(0, 0, 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawStatue(ctx) {
-    ctx.fillStyle = '#b0b0b0';
-    ctx.fillRect(-3.5, -8, 7, 16);
-    ctx.strokeStyle = '#696969';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-3.5, -8, 7, 16);
-    ctx.fillStyle = '#9a9a9a';
-    ctx.fillRect(-5, 7, 10, 2);
-    ctx.fillStyle = '#b0b0b0';
-    ctx.beginPath();
-    ctx.arc(0, -10, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawTreeDeciduous(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-1.5, 3, 3, 6);
-    ctx.strokeStyle = '#5c4a2f';
-    ctx.lineWidth = 0.5;
-    ctx.strokeRect(-1.5, 3, 3, 6);
-    ctx.fillStyle = '#4db876';
-    ctx.beginPath();
-    ctx.arc(0, -1, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2d8659';
-    ctx.beginPath();
-    ctx.arc(-3, 1, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(3, 1, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#6ec898';
-    ctx.beginPath();
-    ctx.arc(-2, -5, 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawTreePine(ctx) {
-    ctx.fillStyle = '#8b6f47';
-    ctx.fillRect(-1, 4, 2, 6);
-    ctx.fillStyle = '#2d8659';
-    ctx.beginPath();
-    ctx.moveTo(0, -9);
-    ctx.lineTo(-8, 2);
-    ctx.lineTo(8, 2);
-    ctx.fill();
-    ctx.fillStyle = '#1a5c2a';
-    ctx.beginPath();
-    ctx.moveTo(0, -3);
-    ctx.lineTo(-6, 6);
-    ctx.lineTo(6, 6);
-    ctx.fill();
-    ctx.fillStyle = '#4db876';
-    ctx.beginPath();
-    ctx.moveTo(0, -6);
-    ctx.lineTo(-4, 0);
-    ctx.lineTo(4, 0);
-    ctx.fill();
-  }
-
-  function drawBush(ctx) {
-    ctx.fillStyle = '#4db876';
-    ctx.beginPath();
-    ctx.arc(-3, 0, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(3, 0, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2d8659';
-    ctx.beginPath();
-    ctx.arc(-3, 1, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(3, 1, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawRockCluster(ctx) {
-    ctx.fillStyle = '#a0a0a0';
-    ctx.beginPath();
-    ctx.arc(-4, -2, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(4, 2, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(0, 6, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#808080';
-    ctx.beginPath();
-    ctx.arc(-4, 0, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(4, 3, 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawBoulder(ctx) {
-    ctx.fillStyle = '#989898';
-    ctx.beginPath();
-    ctx.arc(0, 0, 8.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#707070';
-    ctx.beginPath();
-    ctx.arc(0, 2, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#b0b0b0';
-    ctx.beginPath();
-    ctx.arc(-2, -3, 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawFlowerPatch(ctx) {
-    ctx.fillStyle = '#4db876';
-    ctx.beginPath();
-    ctx.arc(0, 0, 7, 0, Math.PI * 2);
-    ctx.fill();
-    const colors = ['#ff69b4', '#ff0000', '#ffff00', '#0000ff', '#ff8800'];
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2;
-      const x = Math.cos(a) * 4.5;
-      const y = Math.sin(a) * 4.5;
-      ctx.fillStyle = colors[i];
-      ctx.beginPath();
-      ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ffff00';
-      ctx.beginPath();
-      ctx.arc(x, y, 0.7, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function drawPond(ctx) {
-    ctx.fillStyle = '#1e5a96';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 10.5, 7, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#2d7ab8';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 7, 4.5, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 3.5, 2.5, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.fillStyle = '#4db876';
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2;
-      const x = Math.cos(a) * 11;
-      const y = Math.sin(a) * 8;
-      ctx.beginPath();
-      ctx.arc(x, y, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function drawRiverBend(ctx) {
-    ctx.fillStyle = '#1e5a96';
-    ctx.beginPath();
-    ctx.moveTo(-10, -3);
-    ctx.quadraticCurveTo(0, 8, 10, -3);
-    ctx.lineTo(10, 3);
-    ctx.quadraticCurveTo(0, 14, -10, 3);
-    ctx.fill();
-    ctx.strokeStyle = '#2d7ab8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-10, 0);
-    ctx.quadraticCurveTo(0, 10, 10, 0);
-    ctx.stroke();
-    ctx.strokeStyle = '#4db876';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-9, -1);
-    ctx.quadraticCurveTo(0, 9, 9, -1);
-    ctx.stroke();
-  }
-
-  function drawGravestone(ctx) {
-    ctx.fillStyle = '#9a9a9a';
-    ctx.beginPath();
-    ctx.moveTo(0, -9);
-    ctx.lineTo(-5, 8);
-    ctx.lineTo(5, 8);
-    ctx.fill();
-    ctx.strokeStyle = '#5a5a5a';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(0, -9);
-    ctx.lineTo(-5, 8);
-    ctx.lineTo(5, 8);
-    ctx.stroke();
-    ctx.fillStyle = '#555555';
     ctx.beginPath();
     ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#555555';
-    ctx.lineWidth = 0.8;
+  }
+  
+  function drawSecretDoor(ctx) {
+    // Скрытая дверь - выглядит как стена
+    const wallGrad = ctx.createLinearGradient(-7, -8, 7, 8);
+    wallGrad.addColorStop(0, '#888888');
+    wallGrad.addColorStop(0.5, '#686868');
+    wallGrad.addColorStop(1, '#484848');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(-8, -8, 16, 16);
+    
+    // Тонкая трещина показывает где дверь
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 0.3;
     ctx.beginPath();
-    ctx.moveTo(-2, 0);
-    ctx.lineTo(2, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, -2);
-    ctx.lineTo(0, 2);
+    ctx.moveTo(-0.5, -8);
+    ctx.lineTo(-0.5, 8);
     ctx.stroke();
   }
-
-  function drawCampfire(ctx) {
-    ctx.fillStyle = '#6b5340';
-    ctx.fillRect(-7, 2, 14, 3);
-    ctx.strokeStyle = '#4a3728';
+  
+  function drawStairsUp(ctx) {
+    // Лестница вверх
+    for (let i = 0; i < 4; i++) {
+      ctx.fillStyle = '#a0a0a0';
+      ctx.fillRect(-8 + i * 4, -1 - i * 3, 4, 3);
+      ctx.strokeStyle = '#6a6a6a';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(-8 + i * 4, -1 - i * 3, 4, 3);
+    }
+    
+    // Стрелка вверх
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    ctx.moveTo(-1, -10);
+    ctx.lineTo(1, -10);
+    ctx.lineTo(0, -12);
+    ctx.fill();
+  }
+  
+  function drawStairsDown(ctx) {
+    // Лестница вниз
+    for (let i = 0; i < 4; i++) {
+      ctx.fillStyle = '#a0a0a0';
+      ctx.fillRect(-8 + i * 4, 1 + i * 3, 4, 3);
+      ctx.strokeStyle = '#6a6a6a';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(-8 + i * 4, 1 + i * 3, 4, 3);
+    }
+    
+    // Стрелка вниз
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    ctx.moveTo(-1, 10);
+    ctx.lineTo(1, 10);
+    ctx.lineTo(0, 12);
+    ctx.fill();
+  }
+  
+  function drawPillar(ctx) {
+    // Колонна
+    const pillarGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 7);
+    pillarGrad.addColorStop(0, '#b0b0b0');
+    pillarGrad.addColorStop(1, '#7a7a7a');
+    ctx.fillStyle = pillarGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Контур
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Выпуклые кольца
+    ctx.strokeStyle = '#8a8a8a';
     ctx.lineWidth = 0.5;
-    ctx.strokeRect(-7, 2, 14, 3);
-    ctx.fillStyle = '#ff0000';
     ctx.beginPath();
-    ctx.moveTo(-2, 0);
-    ctx.lineTo(-4, -6);
-    ctx.lineTo(0, -8);
-    ctx.lineTo(2, -4);
-    ctx.fill();
-    ctx.fillStyle = '#ff8800';
+    ctx.arc(0, -3, 5, 0, Math.PI * 2);
+    ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(2, 0);
-    ctx.lineTo(0, -7);
-    ctx.lineTo(4, -5);
+    ctx.arc(0, 3, 5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  
+  function drawTorch(ctx) {
+    // Факел на стене
+    // Стержень
+    ctx.fillStyle = '#5c4a2f';
+    ctx.fillRect(-1.5, -8, 3, 10);
+    
+    // Огонь - языки пламени
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath();
+    ctx.moveTo(-3, -3);
+    ctx.quadraticCurveTo(-2, -7, 0, -9);
+    ctx.quadraticCurveTo(2, -7, 3, -3);
     ctx.fill();
+    
+    // Внутренняя часть пламени - ярче
+    ctx.fillStyle = '#ffdd00';
+    ctx.beginPath();
+    ctx.moveTo(-2, -4);
+    ctx.quadraticCurveTo(-1, -6, 0, -7);
+    ctx.quadraticCurveTo(1, -6, 2, -4);
+    ctx.fill();
+  }
+  
+  function drawChest(ctx) {
+    // Сундук
+    ctx.fillStyle = '#8b6f47';
+    ctx.fillRect(-8, -2, 16, 10);
+    ctx.strokeStyle = '#5c4a2f';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-8, -2, 16, 10);
+    
+    // Крышка
+    ctx.fillStyle = '#a0826d';
+    ctx.beginPath();
+    ctx.arc(-8, -2, 3, 0, Math.PI, true);
+    ctx.arc(8, -2, 3, Math.PI, 0, true);
+    ctx.fill();
+    
+    // Замок
+    ctx.fillStyle = '#d4a574';
+    ctx.fillRect(-1, 2, 2, 2);
+    ctx.fillStyle = '#8b4513';
+    ctx.beginPath();
+    ctx.arc(0, 3, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  function drawTrap(ctx) {
+    // Ловушка - выглядит опасно
+    ctx.fillStyle = '#6a6a6a';
+    ctx.fillRect(-10, -8, 20, 16);
+    
+    // Шипы
+    ctx.fillStyle = '#cc3333';
+    for (let i = -8; i <= 8; i += 4) {
+      for (let j = -6; j <= 6; j += 5) {
+        ctx.beginPath();
+        ctx.moveTo(i, j);
+        ctx.lineTo(i + 1.5, j - 3);
+        ctx.lineTo(i - 1.5, j - 3);
+        ctx.fill();
+      }
+    }
+  }
+  
+  function drawAltar(ctx) {
+    // Алтарь
+    ctx.fillStyle = '#8b4513';
+    ctx.fillRect(-10, -4, 20, 10);
+    ctx.strokeStyle = '#5c4a2f';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-10, -4, 20, 10);
+    
+    // Верхняя часть с символом
     ctx.fillStyle = '#ffcc00';
     ctx.beginPath();
-    ctx.arc(0, -2, 2, 0, Math.PI * 2);
+    ctx.moveTo(0, -6);
+    ctx.lineTo(3, -2);
+    ctx.lineTo(0, -1);
+    ctx.lineTo(-3, -2);
     ctx.fill();
   }
+  
+  function drawCage(ctx) {
+    // Клетка - решётка
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-8, -8, 16, 16);
+    
+    // Вертикальные прутья
+    for (let i = -6; i <= 6; i += 3) {
+      ctx.beginPath();
+      ctx.moveTo(i, -8);
+      ctx.lineTo(i, 8);
+      ctx.stroke();
+    }
+    
+    // Горизонтальные прутья
+    for (let j = -6; j <= 6; j += 3) {
+      ctx.beginPath();
+      ctx.moveTo(-8, j);
+      ctx.lineTo(8, j);
+      ctx.stroke();
+    }
+  }
+  
+  function drawRubble(ctx) {
+    // Развалины - камни
+    ctx.fillStyle = '#9a9a9a';
+    ctx.fillRect(-10, 0, 8, 8);
+    ctx.fillRect(-2, -6, 9, 8);
+    ctx.fillRect(3, 2, 8, 6);
+    
+    // Трещины
+    ctx.strokeStyle = '#5a5a5a';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-10, 2);
+    ctx.lineTo(-2, 4);
+    ctx.stroke();
+  }
+  
+  function drawPit(ctx) {
+    // Пропасть
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Контур
+    ctx.strokeStyle = '#5a5a5a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Край с трещинами
+    ctx.strokeStyle = '#6a6a6a';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const x = Math.cos(a) * 8;
+      const y = Math.sin(a) * 8;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x * 1.2, y * 1.2);
+      ctx.stroke();
+    }
+  }
+  
+  function drawStatue(ctx) {
+    // Статуя
+    ctx.fillStyle = '#b0b0b0';
+    ctx.fillRect(-5, -8, 10, 8);
+    ctx.beginPath();
+    ctx.arc(0, -8, 5, 0, Math.PI, true);
+    ctx.fill();
+    
+    // Постамент
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillRect(-7, 0, 14, 6);
+    ctx.strokeStyle = '#5a5a5a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-7, 0, 14, 6);
+  }
+  
+  // ===== NATURE PROPS - Organic, Green, Water, Rocks =====
+  
+  function drawTreeDeciduous(ctx) {
+    // Лиственное дерево - круглая крона со стволом
+    // Ствол
+    ctx.fillStyle = '#5c4a2f';
+    ctx.fillRect(-1.5, 0, 3, 8);
+    ctx.fillStyle = '#4a3a1f';
+    ctx.fillRect(-1, 1, 2, 6);
+    
+    // Крона - многослойная
+    const treeGrad = ctx.createRadialGradient(0, -4, 2, 0, -4, 10);
+    treeGrad.addColorStop(0, '#3db347');
+    treeGrad.addColorStop(0.6, '#2d8a3a');
+    treeGrad.addColorStop(1, '#1d5a2a');
+    ctx.fillStyle = treeGrad;
+    ctx.beginPath();
+    ctx.arc(0, -4, 9, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Верхний слой кроны - светлее
+    ctx.fillStyle = '#4db876';
+    ctx.beginPath();
+    ctx.arc(0, -5, 7, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Свет сверху
+    ctx.fillStyle = 'rgba(200, 255, 200, 0.3)';
+    ctx.beginPath();
+    ctx.arc(-2, -8, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  function drawTreePine(ctx) {
+    // Хвойное дерево - остроконечное
+    // Ствол
+    ctx.fillStyle = '#6b5340';
+    ctx.fillRect(-1, 2, 2, 6);
+    
+    // Конус хвои - 3 уровня
+    ctx.fillStyle = '#1d4d2a';
+    ctx.beginPath();
+    ctx.moveTo(0, -9);
+    ctx.lineTo(8, 1);
+    ctx.lineTo(-8, 1);
+    ctx.fill();
+    
+    ctx.fillStyle = '#2d5c3a';
+    ctx.beginPath();
+    ctx.moveTo(0, -4);
+    ctx.lineTo(7, 4);
+    ctx.lineTo(-7, 4);
+    ctx.fill();
+    
+    ctx.fillStyle = '#3d7c4a';
+    ctx.beginPath();
+    ctx.moveTo(0, 1);
+    ctx.lineTo(6, 8);
+    ctx.lineTo(-6, 8);
+    ctx.fill();
+  }
+  
+  function drawBush(ctx) {
+    // Куст - несколько перекрывающихся кругов
+    ctx.fillStyle = '#3d7c4a';
+    ctx.beginPath();
+    ctx.arc(-3, -1, 5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(3, -1, 5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(0, 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Светлые блики
+    ctx.fillStyle = '#4db876';
+    ctx.beginPath();
+    ctx.arc(-2, -4, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(2, -4, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  function drawRockCluster(ctx) {
+    // Скальное образование - острые камни
+    ctx.fillStyle = '#9a9a9a';
+    ctx.beginPath();
+    ctx.moveTo(0, -10);
+    ctx.lineTo(8, 2);
+    ctx.lineTo(6, 8);
+    ctx.lineTo(-6, 8);
+    ctx.lineTo(-8, 2);
+    ctx.fill();
+    
+    // Второй камень
+    ctx.beginPath();
+    ctx.moveTo(-5, -4);
+    ctx.lineTo(3, 0);
+    ctx.lineTo(2, 6);
+    ctx.lineTo(-6, 4);
+    ctx.fill();
+    
+    // Тень
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillRect(-6, 7, 12, 1);
+  }
+  
+  function drawBoulder(ctx) {
+    // Валун - большой округлый камень
+    const boulderGrad = ctx.createRadialGradient(-2, -2, 1, 0, 0, 10);
+    boulderGrad.addColorStop(0, '#c0c0c0');
+    boulderGrad.addColorStop(0.7, '#8a8a8a');
+    boulderGrad.addColorStop(1, '#6a6a6a');
+    ctx.fillStyle = boulderGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 9, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Трещины
+    ctx.strokeStyle = '#4a4a4a';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-5, -6);
+    ctx.lineTo(3, 5);
+    ctx.stroke();
+  }
+  
+  function drawFlowerPatch(ctx) {
+    // Цветы - яркие пятна
+    ctx.fillStyle = '#ff6b9d';
+    for (let i = -4; i <= 4; i += 3) {
+      ctx.beginPath();
+      ctx.arc(i, -2, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    ctx.fillStyle = '#ffb6c1';
+    for (let j = 0; j <= 4; j += 3) {
+      ctx.beginPath();
+      ctx.arc(j - 2, 2, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Стебли
+    ctx.strokeStyle = '#4db876';
+    ctx.lineWidth = 1;
+    for (let i = -4; i <= 4; i += 3) {
+      ctx.beginPath();
+      ctx.moveTo(i, -2);
+      ctx.lineTo(i, 2);
+      ctx.stroke();
+    }
+  }
+  
+  function drawPond(ctx) {
+    // Пруд - водоём с берегом
+    ctx.fillStyle = '#1e5a96';
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Блик света на воде
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.beginPath();
+    ctx.arc(-3, -4, 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Берег
+    ctx.strokeStyle = '#8b6f47';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  
+  function drawRiverBend(ctx) {
+    // Река - изогнутая полоса воды
+    ctx.fillStyle = '#1e5a96';
+    ctx.beginPath();
+    ctx.moveTo(-10, -6);
+    ctx.quadraticCurveTo(-8, 0, -4, 6);
+    ctx.lineTo(4, 6);
+    ctx.quadraticCurveTo(8, 0, 10, -6);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Блики
+    ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
+    ctx.beginPath();
+    ctx.moveTo(-8, -2);
+    ctx.quadraticCurveTo(-6, 0, -4, 2);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  
+  function drawGravestone(ctx) {
+    // Надгробие
+    ctx.fillStyle = '#8a8a8a';
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.lineTo(6, 4);
+    ctx.lineTo(-6, 4);
+    ctx.fill();
+    
+    // Перекладина
+    ctx.fillStyle = '#6a6a6a';
+    ctx.fillRect(-4, 0, 8, 1);
+    
+    // Крест
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -6);
+    ctx.lineTo(0, 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-2, -2);
+    ctx.lineTo(2, -2);
+    ctx.stroke();
+  }
+  
+  function drawCampfire(ctx) {
+    // Костёр
+    // Дрова
+    ctx.fillStyle = '#5c4a2f';
+    ctx.beginPath();
+    ctx.moveTo(-3, 6);
+    ctx.lineTo(-5, -2);
+    ctx.lineTo(-2, 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(3, 6);
+    ctx.lineTo(5, -2);
+    ctx.lineTo(2, 2);
+    ctx.fill();
+    
+    // Пламя - три уровня
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath();
+    ctx.moveTo(-2, 2);
+    ctx.quadraticCurveTo(0, -4, 2, 2);
+    ctx.lineTo(1, 4);
+    ctx.lineTo(-1, 4);
+    ctx.fill();
+    
+    ctx.fillStyle = '#ffdd00';
+    ctx.beginPath();
+    ctx.moveTo(-1, 0);
+    ctx.quadraticCurveTo(0, -2, 1, 0);
+    ctx.lineTo(0.5, 2);
+    ctx.lineTo(-0.5, 2);
+    ctx.fill();
+    
+    // Углы
+    ctx.fillStyle = '#ff6600';
+    ctx.fillRect(-4, 4, 2, 2);
+    ctx.fillRect(2, 4, 2, 2);
+  }
+
 
   function pixelToGrid(px, py) {
     const gx = Math.floor(px / GRID_SIZE);
@@ -1058,8 +1410,8 @@
     const rect = canvas.getBoundingClientRect();
     const canvasX = e.clientX - rect.left;
     const canvasY = e.clientY - rect.top;
-    const worldX = (canvasX - state.panX) / state.zoom;
-    const worldY = (canvasY - state.panY) / state.zoom;
+    const worldX = canvasX / state.zoom - state.panX;
+    const worldY = canvasY / state.zoom - state.panY;
 
     if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
       state.panStart = { x: canvasX, y: canvasY };
@@ -1088,8 +1440,8 @@
     const rect = canvas.getBoundingClientRect();
     const canvasX = e.clientX - rect.left;
     const canvasY = e.clientY - rect.top;
-    const worldX = (canvasX - state.panX) / state.zoom;
-    const worldY = (canvasY - state.panY) / state.zoom;
+    const worldX = canvasX / state.zoom - state.panX;
+    const worldY = canvasY / state.zoom - state.panY;
 
     const { label } = pixelToGrid(worldX, worldY);
     document.getElementById('gridCoords').textContent = label;
