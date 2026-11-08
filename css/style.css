@@ -1,0 +1,402 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* Canvas */
+#canvas {
+  flex: 1;
+  cursor: crosshair;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  display: block;
+}
+
+/* Toolbar */
+.toolbar {
+  background: linear-gradient(180deg, #2a2a2a, #1f1f1f);
+  border-bottom: 1px solid #444;
+  padding: 8px 12px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 12px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: #444;
+  border-color: #777;
+}
+
+.btn.primary {
+  background: #0066cc;
+  border-color: #0055bb;
+}
+
+.btn.primary:hover {
+  background: #0077dd;
+}
+
+.btn.toggle.active {
+  background: #00aa00;
+  border-color: #00cc00;
+}
+
+.mode-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.mode-label select {
+  padding: 4px 8px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Left Panel - Terrain */
+.left-panel {
+  position: fixed;
+  left: 0;
+  top: 48px;
+  width: 160px;
+  height: calc(100% - 48px - 30px);
+  background: linear-gradient(90deg, #2a2a2a, #222);
+  border-right: 1px solid #444;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.panel-header {
+  padding: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #444;
+  font-size: 14px;
+}
+
+.brush-section {
+  padding: 12px;
+  border-bottom: 1px solid #444;
+}
+
+.fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.brush-size-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#brushSize {
+  flex: 1;
+  cursor: pointer;
+}
+
+.size-label {
+  font-size: 12px;
+  min-width: 24px;
+  text-align: right;
+}
+
+.terrain-swatches {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.terrain-btn {
+  padding: 8px;
+  background: #333;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.terrain-btn:hover {
+  background: #444;
+  border-color: #777;
+}
+
+.terrain-btn.active {
+  border-color: #0066cc;
+  background: #0066cc;
+}
+
+/* Right Panel - Props */
+.right-panel {
+  position: fixed;
+  right: 0;
+  top: 48px;
+  width: 200px;
+  height: calc(100% - 48px - 30px);
+  background: linear-gradient(90deg, #222, #2a2a2a);
+  border-left: 1px solid #444;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.palette-controls {
+  padding: 8px;
+  border-bottom: 1px solid #444;
+}
+
+.filter-box {
+  width: 100%;
+  padding: 6px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.palette-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border-bottom: 1px solid #444;
+}
+
+.palette-tab {
+  padding: 6px 8px;
+  background: #333;
+  color: #999;
+  border: 1px solid #444;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.palette-tab:hover {
+  background: #3a3a3a;
+}
+
+.palette-tab.active {
+  background: #0066cc;
+  color: #fff;
+  border-color: #0055bb;
+}
+
+.prop-palette {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.prop-icon {
+  aspect-ratio: 1;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.prop-icon:hover {
+  background: #444;
+  border-color: #777;
+  transform: scale(1.05);
+}
+
+.prop-icon.selected {
+  background: #0066cc;
+  border-color: #0055bb;
+  box-shadow: 0 0 8px rgba(0, 102, 204, 0.5);
+}
+
+.prop-name {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 2px;
+  font-size: 9px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: bottom 0.3s;
+  color: #aaa;
+}
+
+.prop-icon:hover .prop-name {
+  bottom: 0;
+}
+
+/* Status Bar */
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #1f1f1f, #2a2a2a);
+  border-top: 1px solid #444;
+  display: flex;
+  gap: 16px;
+  padding: 0 12px;
+  align-items: center;
+  font-size: 12px;
+  z-index: 99;
+}
+
+.status-item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-item span {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+/* Main content area (between panels) */
+#container {
+  padding-left: 160px;
+  padding-right: 200px;
+  padding-bottom: 30px;
+}
+
+/* Modal Dialog */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.modal-content .fld {
+  margin-bottom: 12px;
+}
+
+.modal-content input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Selection outline on canvas (for selected props) */
+.selected-outline {
+  stroke: #0066cc;
+  stroke-width: 2;
+  fill: rgba(0, 102, 204, 0.1);
+}
+
+/* Drop shadow for props */
+filter-shadow {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.4));
+}

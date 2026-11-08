@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>D&D MapMaker — Terrain & Prop Editor</title>
+<link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+<div id="container">
+  <canvas id="canvas"></canvas>
+
+  <!-- Top toolbar -->
+  <div id="toolbar" class="toolbar">
+    <div class="toolbar-group">
+      <button id="btnNew" class="btn" title="New Map (N)">📄 New</button>
+      <button id="btnSave" class="btn" title="Save to File">💾 Save</button>
+      <button id="btnLoad" class="btn" title="Load from File">📂 Load</button>
+      <button id="btnExport" class="btn" title="Export as PNG">🖼️ PNG</button>
+    </div>
+    <div class="toolbar-group">
+      <button id="btnUndo" class="btn" title="Undo (Ctrl+Z)">↶ Undo</button>
+      <button id="btnRedo" class="btn" title="Redo (Ctrl+Y)">↷ Redo</button>
+    </div>
+    <div class="toolbar-group">
+      <button id="btnGrid" class="btn toggle" title="Toggle Grid">⊞ Grid</button>
+      <button id="btnSnap" class="btn toggle" title="Toggle Snap to Grid">🧲 Snap</button>
+    </div>
+    <div class="toolbar-group">
+      <label class="mode-label">Mode: 
+        <select id="modeSelector" title="Switch between Town and Dungeon mode">
+          <option value="town">Town / City</option>
+          <option value="dungeon">Dungeon / Location</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Left sidebar: Terrain brushes -->
+  <aside id="leftPanel" class="left-panel">
+    <div class="panel-header">Terrain</div>
+    <div class="brush-section">
+      <label class="fld">Brush Size</label>
+      <div class="brush-size-row">
+        <input id="brushSize" type="range" min="5" max="100" value="20">
+        <span id="brushSizeLabel" class="size-label">20</span>
+      </div>
+    </div>
+    <div class="terrain-swatches">
+      <button class="terrain-btn active" data-terrain="grass" title="Grass">🌱 Grass</button>
+      <button class="terrain-btn" data-terrain="forest" title="Forest">🌲 Forest</button>
+      <button class="terrain-btn" data-terrain="mountain" title="Mountain">⛰️ Mountain</button>
+      <button class="terrain-btn" data-terrain="water" title="Water">💧 Water</button>
+      <button class="terrain-btn" data-terrain="sand" title="Sand/Desert">🏜️ Sand</button>
+      <button class="terrain-btn" data-terrain="snow" title="Snow">❄️ Snow</button>
+      <button class="terrain-btn" data-terrain="swamp" title="Swamp">🪨 Swamp</button>
+      <button class="terrain-btn" data-terrain="road" title="Road/Path">🛣️ Road</button>
+      <button class="terrain-btn" data-terrain="dungeon" title="Dungeon Stone">🧱 Stone</button>
+      <button class="terrain-btn" data-terrain="wall" title="Dungeon Wall">🚪 Wall</button>
+    </div>
+  </aside>
+
+  <!-- Right sidebar: Props palette -->
+  <aside id="rightPanel" class="right-panel">
+    <div class="panel-header">Props & Buildings</div>
+    <div class="palette-controls">
+      <input id="propFilter" type="text" placeholder="Filter props..." class="filter-box">
+    </div>
+    <div class="palette-tabs">
+      <button class="palette-tab active" data-tab="town">Town / City</button>
+      <button class="palette-tab" data-tab="dungeon">Dungeon / Location</button>
+      <button class="palette-tab" data-tab="nature">Landscape / Nature</button>
+    </div>
+    <div id="propPalette" class="prop-palette">
+      <!-- Dynamically populated by JS -->
+    </div>
+  </aside>
+
+  <!-- Bottom status bar -->
+  <div id="statusBar" class="status-bar">
+    <div class="status-item">Zoom: <span id="zoomLevel">100%</span></div>
+    <div class="status-item">Grid: <span id="gridCoords">—</span></div>
+    <div class="status-item">Mode: <span id="modeStatus">Town</span></div>
+  </div>
+</div>
+
+<!-- New Map Dialog -->
+<div id="newMapDialog" class="modal hidden">
+  <div class="modal-content">
+    <h2>New Map</h2>
+    <label class="fld">Width (cells): <input id="mapWidth" type="number" value="50" min="10" max="200"></label>
+    <label class="fld">Height (cells): <input id="mapHeight" type="number" value="50" min="10" max="200"></label>
+    <div class="modal-buttons">
+      <button id="btnCreateMap" class="btn primary">Create</button>
+      <button id="btnCancelMap" class="btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- File input for loading -->
+<input id="fileInput" type="file" accept=".json" style="display:none;">
+
+<script src="js/app.js?v=1"></script>
+</body>
+</html>
