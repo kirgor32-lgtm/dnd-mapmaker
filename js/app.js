@@ -1796,8 +1796,7 @@
   }
 
   function init() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    resizeCanvasToDisplaySize();
     saveHistory();
     populateAllPalettes();
     updateHistoryButtons();
@@ -1807,10 +1806,15 @@
     }
     render();
     window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      resizeCanvasToDisplaySize();
       render();
     });
+  }
+
+  function resizeCanvasToDisplaySize() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(rect.width));
+    canvas.height = Math.max(1, Math.round(rect.height));
   }
 
   init();
