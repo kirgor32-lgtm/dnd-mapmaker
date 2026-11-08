@@ -5,17 +5,127 @@
   const GRID_SIZE = 32;
   const ICON_SCALE = 1.3; // постройки крупнее клетки сетки для читаемости деталей, но без наезда на соседей
   const TERRAIN_TYPES = {
-    grass: { color: '#2d8659', light: '#4db876', dark: '#1a4d35', label: 'Трава' },
-    forest: { color: '#1a5c2a', light: '#2d8659', dark: '#0d3318', label: 'Лес' },
-    mountain: { color: '#6b4423', light: '#8b5a2b', dark: '#4a2c15', label: 'Гора' },
-    water: { color: '#1e5a96', light: '#2d7ab8', dark: '#0d3d66', label: 'Вода' },
-    sand: { color: '#d4a574', light: '#e8bf8f', dark: '#b8845c', label: 'Песок' },
-    snow: { color: '#e8e8e8', light: '#f5f5f5', dark: '#d0d0d0', label: 'Снег' },
-    swamp: { color: '#3d5c2a', light: '#546b3a', dark: '#2a4118', label: 'Болото' },
-    road: { color: '#8b7355', light: '#a8896f', dark: '#6b5340', label: 'Дорога' },
-    dungeon: { color: '#4a4a4a', light: '#5c5c5c', dark: '#333333', label: 'Камень' },
+    grass: { color: '#4f9153', light: '#6cb66a', dark: '#2f5e34', label: 'Трава' },
+    forest: { color: '#285c30', light: '#3f7a3f', dark: '#163a1c', label: 'Лес' },
+    mountain: { color: '#7c7266', light: '#a6998a', dark: '#4a443c', label: 'Гора' },
+    water: { color: '#2d6fa8', light: '#4a94c9', dark: '#164a73', label: 'Вода' },
+    sand: { color: '#dcc180', light: '#ecd9a0', dark: '#b89a5c', label: 'Песок' },
+    snow: { color: '#e9edf0', light: '#ffffff', dark: '#c6d1d8', label: 'Снег' },
+    swamp: { color: '#4a5a34', light: '#637246', dark: '#2e3920', label: 'Болото' },
+    road: { color: '#9c8564', light: '#b59c7a', dark: '#75624a', label: 'Дорога' },
+    dungeon: { color: '#55524c', light: '#6b675f', dark: '#3a3834', label: 'Камень' },
     wall: { color: '#3a3a3a', light: '#4a4a4a', dark: '#2a2a2a', label: 'Стена' }
   };
+
+  function hash2(x, y) {
+    let h = x * 374761393 + y * 668265263;
+    h = (h ^ (h >> 13)) * 1274126177;
+    h = h ^ (h >> 16);
+    return ((h % 2147483647) + 2147483647) % 2147483647;
+  }
+  function rand2(x, y, n) {
+    return (hash2(x * 97 + n, y * 131 + n * 7) % 10000) / 10000;
+  }
+
+  function drawTerrainTexture(ctx, gx, gy, px, py, type, colors) {
+    const seed = (n) => rand2(gx, gy, n);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, py, GRID_SIZE, GRID_SIZE);
+    ctx.clip();
+    if (type === 'grass' || type === 'swamp') {
+      ctx.strokeStyle = colors.dark;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 7; i++) {
+        const bx = px + seed(i) * GRID_SIZE;
+        const by = py + seed(i + 10) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.moveTo(bx, by + 3);
+        ctx.lineTo(bx + (seed(i + 20) - 0.5) * 3, by - 3);
+        ctx.stroke();
+      }
+    } else if (type === 'forest') {
+      for (let i = 0; i < 4; i++) {
+        const bx = px + 4 + seed(i) * (GRID_SIZE - 8);
+        const by = py + 4 + seed(i + 10) * (GRID_SIZE - 8);
+        const r = 4 + seed(i + 20) * 3;
+        const g = ctx.createRadialGradient(bx - r * 0.3, by - r * 0.3, 0, bx, by, r);
+        g.addColorStop(0, colors.light);
+        g.addColorStop(1, colors.dark);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(bx, by, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (type === 'mountain') {
+      ctx.fillStyle = colors.dark;
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(px + GRID_SIZE * 0.2, py + GRID_SIZE * 0.85);
+      ctx.lineTo(px + GRID_SIZE * 0.5, py + GRID_SIZE * 0.25);
+      ctx.lineTo(px + GRID_SIZE * 0.8, py + GRID_SIZE * 0.85);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.moveTo(px + GRID_SIZE * 0.42, py + GRID_SIZE * 0.42);
+      ctx.lineTo(px + GRID_SIZE * 0.5, py + GRID_SIZE * 0.25);
+      ctx.lineTo(px + GRID_SIZE * 0.58, py + GRID_SIZE * 0.42);
+      ctx.closePath();
+      ctx.fill();
+    } else if (type === 'water') {
+      ctx.strokeStyle = colors.light;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1.2;
+      for (let i = 0; i < 3; i++) {
+        const wy = py + 6 + i * 9 + seed(i) * 4;
+        ctx.beginPath();
+        ctx.moveTo(px + 2, wy);
+        ctx.quadraticCurveTo(px + GRID_SIZE / 2, wy - 4, px + GRID_SIZE - 2, wy);
+        ctx.stroke();
+      }
+    } else if (type === 'sand') {
+      ctx.fillStyle = colors.dark;
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < 10; i++) {
+        const bx = px + seed(i) * GRID_SIZE;
+        const by = py + seed(i + 15) * GRID_SIZE;
+        ctx.fillRect(bx, by, 1.5, 1.5);
+      }
+    } else if (type === 'snow') {
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.8;
+      for (let i = 0; i < 8; i++) {
+        const bx = px + seed(i) * GRID_SIZE;
+        const by = py + seed(i + 15) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.arc(bx, by, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (type === 'road' || type === 'dungeon' || type === 'wall') {
+      ctx.strokeStyle = colors.dark;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1;
+      const rows = 3;
+      for (let r = 0; r < rows; r++) {
+        const by = py + (r + 1) * (GRID_SIZE / (rows + 1));
+        const offset = r % 2 === 0 ? 0 : GRID_SIZE / 2;
+        ctx.beginPath();
+        ctx.moveTo(px, by);
+        ctx.lineTo(px + GRID_SIZE, by);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px + offset, by - GRID_SIZE / (rows + 1));
+        ctx.lineTo(px + offset, by);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
 
   const PROP_LIBRARY = {
     town: [
@@ -33,6 +143,7 @@
       { id: 'well', name: 'Колодец', drawIcon: drawWell, footprint: 1 },
       { id: 'temple', name: 'Храм', drawIcon: drawTemple, footprint: 3 },
       { id: 'tavern', name: 'Таверна', drawIcon: drawTavern, footprint: 3 },
+      { id: 'forge', name: 'Кузница', drawIcon: drawForge, footprint: 2 },
       { id: 'windmill', name: 'Мельница', drawIcon: drawWindmill, footprint: 2 },
       { id: 'dock', name: 'Пристань', drawIcon: drawDock, footprint: 2 },
       { id: 'farm', name: 'Ферма', drawIcon: drawFarm, footprint: 3 },
@@ -361,77 +472,188 @@
   }
   
   function drawWatchtower(ctx) {
-    // Сторожевая башня - круглая со стрельницами
-    const towerGrad = ctx.createRadialGradient(0, -1, 2, 0, 0, 10);
-    towerGrad.addColorStop(0, '#a9a9a9');
-    towerGrad.addColorStop(1, '#7a7a7a');
+    // Круглая каменная башня с остроконечной крышей
+    const towerGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, 9);
+    towerGrad.addColorStop(0, '#c2b296');
+    towerGrad.addColorStop(1, '#8a7a62');
     ctx.fillStyle = towerGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 9, 0, Math.PI * 2);
+    ctx.arc(0, 2, 9, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Контур
-    ctx.strokeStyle = '#5a5a5a';
+    ctx.strokeStyle = '#5a4e3c';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(0, 0, 9, 0, Math.PI * 2);
     ctx.stroke();
-    
-    // Стрельницы
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2;
-      const x = Math.cos(a) * 10;
-      const y = Math.sin(a) * 10;
-      ctx.fillStyle = '#3a3a3a';
-      ctx.fillRect(x - 2, y - 1.5, 4, 3);
+
+    // Каменная кладка (горизонтальные полосы)
+    ctx.strokeStyle = 'rgba(80,65,45,0.4)';
+    ctx.lineWidth = 0.6;
+    for (let r = -8; r <= 10; r += 3) {
+      ctx.beginPath();
+      ctx.moveTo(-8.5, 2 + r * 0.9);
+      ctx.lineTo(8.5, 2 + r * 0.9);
+      ctx.stroke();
     }
-    
-    // Крыша - конус сверху
-    const roofGrad = ctx.createRadialGradient(0, -5, 0, 0, 0, 15);
-    roofGrad.addColorStop(0, '#d4a574');
-    roofGrad.addColorStop(1, '#8b7355');
+
+    // Пара бойниц
+    ctx.fillStyle = '#2a2420';
+    ctx.fillRect(-1, -2, 2, 5);
+    ctx.fillRect(-6, 3, 1.6, 4);
+    ctx.fillRect(4.4, 3, 1.6, 4);
+
+    // Зубчатый парапет под крышей
+    ctx.fillStyle = '#9a8a6e';
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const x = Math.cos(a) * 9.5;
+      const y = Math.sin(a) * 9.5 + 2;
+      ctx.fillRect(x - 1, y - 1, 2, 2);
+    }
+
+    // Остроконечная коническая крыша (явный треугольный силуэт)
+    const roofGrad = ctx.createLinearGradient(0, -16, 0, -2);
+    roofGrad.addColorStop(0, '#9c3d2e');
+    roofGrad.addColorStop(1, '#6e2a1f');
     ctx.fillStyle = roofGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.moveTo(0, -16);
+    ctx.lineTo(8, -2);
+    ctx.quadraticCurveTo(0, 2, -8, -2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#4a1e15';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Флажок
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.beginPath();
+    ctx.moveTo(0, -16);
+    ctx.lineTo(0, -20);
+    ctx.stroke();
+    ctx.fillStyle = '#c0392b';
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(4, -18.5);
+    ctx.lineTo(0, -17);
     ctx.fill();
   }
   
   function drawCastle(ctx) {
-    // Замок с четырьмя башнями
-    // Основная часть
+    // Замок: центральный зал + четыре угловые башни с коническими крышами
     const wallGrad = ctx.createLinearGradient(-12, -8, 12, 8);
-    wallGrad.addColorStop(0, '#9a9a9a');
-    wallGrad.addColorStop(0.5, '#b0b0b0');
-    wallGrad.addColorStop(1, '#8a8a8a');
+    wallGrad.addColorStop(0, '#c9b896');
+    wallGrad.addColorStop(0.5, '#b3a07c');
+    wallGrad.addColorStop(1, '#93815f');
     ctx.fillStyle = wallGrad;
     ctx.fillRect(-12, -6, 24, 12);
-    
-    // Башни по углам
-    ctx.fillStyle = '#7a7a7a';
-    ctx.fillRect(-15, -8, 5, 8);
-    ctx.fillRect(10, -8, 5, 8);
-    ctx.fillRect(-15, 2, 5, 6);
-    ctx.fillRect(10, 2, 5, 6);
-    
-    // Крыши башен
-    ctx.fillStyle = '#5a5a5a';
+    ctx.strokeStyle = '#5a4e3c';
+    ctx.lineWidth = 0.6;
+    for (let x = -10; x <= 10; x += 4) {
+      ctx.beginPath();
+      ctx.moveTo(x, -6);
+      ctx.lineTo(x, 6);
+      ctx.stroke();
+    }
+
+    // Угловые башни (круглые, не прямоугольные "железные")
+    const towers = [[-14, -8], [14, -8], [-14, 8], [14, 8]];
+    for (const [tx, ty] of towers) {
+      const tg = ctx.createRadialGradient(tx - 1, ty - 1, 1, tx, ty, 4.5);
+      tg.addColorStop(0, '#c2b296');
+      tg.addColorStop(1, '#8a7a62');
+      ctx.fillStyle = tg;
+      ctx.beginPath();
+      ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#5a4e3c';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      // Коническая крыша башни
+      ctx.fillStyle = '#7a2a20';
+      ctx.beginPath();
+      ctx.moveTo(tx, ty - 9);
+      ctx.lineTo(tx + 4, ty - 1);
+      ctx.lineTo(tx - 4, ty - 1);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Зубцы на главной стене
+    ctx.fillStyle = '#b3a07c';
+    for (let x = -11; x <= 11; x += 3) {
+      ctx.fillRect(x - 1, -8, 2, 2);
+    }
+
+    // Главные ворота с решёткой
+    ctx.fillStyle = '#2a2420';
+    ctx.fillRect(-5, -3, 10, 9);
+    ctx.strokeStyle = '#6e5c42';
+    ctx.lineWidth = 0.7;
+    for (let x = -4; x <= 4; x += 2) {
+      ctx.beginPath();
+      ctx.moveTo(x, -3);
+      ctx.lineTo(x, 6);
+      ctx.stroke();
+    }
+
+    // Флаг на центральной башне
+    ctx.strokeStyle = '#3a3a3a';
     ctx.beginPath();
-    ctx.moveTo(-15, -8);
-    ctx.lineTo(-12.5, -10);
-    ctx.lineTo(-10, -8);
-    ctx.fill();
-    
+    ctx.moveTo(0, -6);
+    ctx.lineTo(0, -12);
+    ctx.stroke();
+    ctx.fillStyle = '#c0392b';
     ctx.beginPath();
-    ctx.moveTo(10, -8);
-    ctx.lineTo(12.5, -10);
-    ctx.lineTo(15, -8);
+    ctx.moveTo(0, -12);
+    ctx.lineTo(5, -10.5);
+    ctx.lineTo(0, -9);
     ctx.fill();
-    
-    // Главные ворота
-    ctx.fillStyle = '#3a3a3a';
-    ctx.fillRect(-6, -4, 12, 8);
-    ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-4, -2, 8, 4);
+  }
+  
+  function drawForge(ctx) {
+    // Кузница: приземистое каменное здание с дымовой трубой и наковальней
+    const wallGrad = ctx.createLinearGradient(-10, -8, 10, 8);
+    wallGrad.addColorStop(0, '#8a7262');
+    wallGrad.addColorStop(1, '#5c4a3c');
+    ctx.fillStyle = wallGrad;
+    ctx.beginPath();
+    ctx.moveTo(-10, -4);
+    ctx.lineTo(-10, 9);
+    ctx.lineTo(10, 9);
+    ctx.lineTo(10, -4);
+    ctx.lineTo(0, -10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#3a2e24';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Дымовая труба с дымом
+    ctx.fillStyle = '#4a3c30';
+    ctx.fillRect(5, -16, 4, 8);
+    ctx.fillStyle = 'rgba(120,120,120,0.5)';
+    ctx.beginPath();
+    ctx.arc(7, -19, 2.5, 0, Math.PI * 2);
+    ctx.arc(9, -23, 3, 0, Math.PI * 2);
+    ctx.arc(6, -25, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Открытый горн со свечением
+    ctx.fillStyle = '#2a2420';
+    ctx.fillRect(-7, 0, 6, 7);
+    const fireGrad = ctx.createRadialGradient(-4, 3, 0, -4, 3, 3.5);
+    fireGrad.addColorStop(0, '#ffdd55');
+    fireGrad.addColorStop(0.5, '#ff6a1f');
+    fireGrad.addColorStop(1, 'rgba(255,60,0,0)');
+    ctx.fillStyle = fireGrad;
+    ctx.beginPath();
+    ctx.arc(-4, 3, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Наковальня у входа
+    ctx.fillStyle = '#2f2f2f';
+    ctx.fillRect(2, 6, 6, 2);
+    ctx.fillRect(4, 4, 2, 2);
   }
   
   function drawCityWall(ctx) {
@@ -1324,6 +1546,8 @@
       ctx.fillStyle = grad;
       ctx.fillRect(px, py, GRID_SIZE, GRID_SIZE);
 
+      drawTerrainTexture(ctx, gx, gy, px, py, terrain, colors);
+
       ctx.strokeStyle = colors.dark;
       ctx.globalAlpha = 0.3;
       ctx.lineWidth = 1;
@@ -1687,6 +1911,7 @@
       grad.addColorStop(1, colors.dark);
       exportCtx.fillStyle = grad;
       exportCtx.fillRect(px, py, GRID_SIZE, GRID_SIZE);
+      drawTerrainTexture(exportCtx, gx, gy, px, py, terrain, colors);
     }
 
     for (const prop of state.props) {
