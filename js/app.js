@@ -3,6 +3,7 @@
   'use strict';
 
   const GRID_SIZE = 32;
+  const ICON_SCALE = 1.7; // постройки крупнее клетки сетки для читаемости деталей
   const TERRAIN_TYPES = {
     grass: { color: '#2d8659', light: '#4db876', dark: '#1a4d35', label: 'Трава' },
     forest: { color: '#1a5c2a', light: '#2d8659', dark: '#0d3318', label: 'Лес' },
@@ -1304,7 +1305,9 @@
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(0, 0, width, height);
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     ctx.save();
+    ctx.scale(dpr, dpr);
     ctx.translate(state.panX, state.panY);
     ctx.scale(state.zoom, state.zoom);
 
@@ -1366,7 +1369,7 @@
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate((prop.rotation * Math.PI) / 180);
-      ctx.scale(prop.scale, prop.scale);
+      ctx.scale(prop.scale * ICON_SCALE, prop.scale * ICON_SCALE);
 
       ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
       ctx.shadowBlur = 4;
@@ -1681,7 +1684,7 @@
       exportCtx.save();
       exportCtx.translate(px, py);
       exportCtx.rotate((prop.rotation * Math.PI) / 180);
-      exportCtx.scale(prop.scale, prop.scale);
+      exportCtx.scale(prop.scale * ICON_SCALE, prop.scale * ICON_SCALE);
       const propDef = findPropDefinition(prop.propId);
       if (propDef && propDef.drawIcon) {
         propDef.drawIcon(exportCtx);
@@ -1705,20 +1708,25 @@
 
   function renderPropIcon(canvas, propDef) {
     const canvasCtx = canvas.getContext('2d');
-    canvas.width = 40;
-    canvas.height = 40;
+    const SZ = 56;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = SZ * DPR;
+    canvas.height = SZ * DPR;
+    canvas.style.width = SZ + 'px';
+    canvas.style.height = SZ + 'px';
+    canvasCtx.scale(DPR, DPR);
     canvasCtx.fillStyle = '#f0f0f0';
-    canvasCtx.fillRect(0, 0, 40, 40);
+    canvasCtx.fillRect(0, 0, SZ, SZ);
     canvasCtx.save();
-    canvasCtx.translate(20, 20);
-    canvasCtx.scale(0.8, 0.8);
+    canvasCtx.translate(SZ / 2, SZ / 2);
+    canvasCtx.scale(1.7, 1.7);
     if (propDef.drawIcon) {
       propDef.drawIcon(canvasCtx);
     }
     canvasCtx.restore();
     canvasCtx.strokeStyle = '#ccc';
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeRect(0, 0, 40, 40);
+    canvasCtx.strokeRect(0, 0, SZ, SZ);
   }
 
   function updatePropPalette() {
@@ -1813,8 +1821,11 @@
 
   function resizeCanvasToDisplaySize() {
     const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.max(1, Math.round(rect.width));
-    canvas.height = Math.max(1, Math.round(rect.height));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    canvas.style.width = Math.round(rect.width) + 'px';
+    canvas.style.height = Math.round(rect.height) + 'px';
   }
 
   init();
