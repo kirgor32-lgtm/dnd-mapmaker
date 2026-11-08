@@ -3,7 +3,7 @@
   'use strict';
 
   const GRID_SIZE = 32;
-  const ICON_SCALE = 1.7; // постройки крупнее клетки сетки для читаемости деталей
+  const ICON_SCALE = 1.3; // постройки крупнее клетки сетки для читаемости деталей, но без наезда на соседей
   const TERRAIN_TYPES = {
     grass: { color: '#2d8659', light: '#4db876', dark: '#1a4d35', label: 'Трава' },
     forest: { color: '#1a5c2a', light: '#2d8659', dark: '#0d3318', label: 'Лес' },
