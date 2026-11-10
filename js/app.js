@@ -1651,6 +1651,21 @@
         ctx.lineWidth = 2 / state.zoom;
         ctx.setLineDash([4 / state.zoom, 3 / state.zoom]);
         ctx.strokeRect(-halfPx, -halfPx, halfPx * 2, halfPx * 2);
+        ctx.setLineDash([]);
+        // Рукоятка поворота: линия вверх + кружок на конце (тащи, чтобы повернуть свободно)
+        const handleDist = halfPx + 18 / state.zoom;
+        ctx.rotate((prop.rotation * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, -halfPx);
+        ctx.lineTo(0, -handleDist);
+        ctx.stroke();
+        ctx.fillStyle = '#2ee6a0';
+        ctx.beginPath();
+        ctx.arc(0, -handleDist, 6 / state.zoom, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#163a2b';
+        ctx.lineWidth = 1.5 / state.zoom;
+        ctx.stroke();
         ctx.restore();
       }
     }
@@ -1672,7 +1687,18 @@
   let isMouseDown = false;
   let paintHistory = false;
   let isDraggingProp = false;
+  let isRotatingProp = false;
   let dragOffset = { x: 0, y: 0 };
+
+  function getRotateHandlePos(prop, footprint) {
+    const halfPx = (footprint * GRID_SIZE) / 2 + 2;
+    const handleDist = halfPx + 18 / state.zoom;
+    const rad = (prop.rotation * Math.PI) / 180;
+    return {
+      x: prop.x + Math.sin(rad) * handleDist,
+      y: prop.y - Math.cos(rad) * handleDist
+    };
+  }
 
   function hitTestProp(worldX, worldY) {
     // Ищем верхний (последний нарисованный) объект под курсором
@@ -1713,6 +1739,19 @@
       state.panStart = { x: canvasX, y: canvasY };
     } else if (e.button === 0) {
       if (state.tool === 'select') {
+        // Если объект уже выбран - сначала проверяем, не кликнули ли по рукоятке поворота
+        if (state.selectedProp >= 0 && state.props[state.selectedProp]) {
+          const curProp = state.props[state.selectedProp];
+          const curDef = findPropDefinition(curProp.propId);
+          const curFootprint = (curDef && curDef.footprint) || 1;
+          const handlePos = getRotateHandlePos(curProp, curFootprint);
+          const handleR = 10 / state.zoom;
+          if (Math.hypot(worldX - handlePos.x, worldY - handlePos.y) <= handleR) {
+            isRotatingProp = true;
+            render();
+            return;
+          }
+        }
         const hit = hitTestProp(worldX, worldY);
         state.selectedProp = hit;
         if (hit >= 0) {
@@ -1780,6 +1819,12 @@
       }
       prop.x = nx;
       prop.y = ny;
+    } else if (isRotatingProp && state.selectedProp >= 0) {
+      const prop = state.props[state.selectedProp];
+      const angleRad = Math.atan2(worldX - prop.x, -(worldY - prop.y));
+      let deg = (angleRad * 180) / Math.PI;
+      if (state.snapToGrid) deg = Math.round(deg / 15) * 15; // привязка - шаг 15°
+      prop.rotation = ((deg % 360) + 360) % 360;
     } else if (isMouseDown) {
       paintTerrain(worldX, worldY);
     }
@@ -1794,6 +1839,10 @@
     }
     if (isDraggingProp) {
       isDraggingProp = false;
+      saveHistory();
+    }
+    if (isRotatingProp) {
+      isRotatingProp = false;
       saveHistory();
     }
     isMouseDown = false;
@@ -1860,28 +1909,10 @@
     document.getElementById('btnRedo').disabled = state.historyIndex >= state.history.length - 1;
   }
 
-  function deleteSelectedProp() {
-    if (state.selectedProp !== null) {
-      state.props.splice(state.selectedProp, 1);
-      state.selectedProp = null;
-      saveHistory();
-      render();
-    }
-  }
-
   function duplicateSelectedProp() {
     if (state.selectedProp !== null) {
       const prop = state.props[state.selectedProp];
       state.props.push({ ...prop, x: prop.x + GRID_SIZE, y: prop.y + GRID_SIZE });
-      saveHistory();
-      render();
-    }
-  }
-
-  function rotateSelectedProp(degrees) {
-    if (state.selectedProp !== null) {
-      const prop = state.props[state.selectedProp];
-      prop.rotation = (prop.rotation + degrees) % 360;
       saveHistory();
       render();
     }
@@ -1953,10 +1984,11 @@
     }
   }
 
-  function rotateSelectedProp() {
+  function rotateSelectedProp(degrees) {
+    const step = typeof degrees === 'number' ? degrees : 90;
     if (state.selectedProp >= 0 && state.selectedProp < state.props.length) {
       const prop = state.props[state.selectedProp];
-      prop.rotation = (prop.rotation + 90) % 360;
+      prop.rotation = ((prop.rotation + step) % 360 + 360) % 360;
       saveHistory();
       render();
     }
