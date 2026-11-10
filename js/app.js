@@ -33,6 +33,39 @@
     ctx.beginPath();
     ctx.rect(px, py, GRID_SIZE, GRID_SIZE);
     ctx.clip();
+    if (type === 'wall') {
+      // RimWorld-стиль: сплошная стена, соединяющаяся с соседними клетками стены
+      const has = (dx, dy) => state.terrain.get((gx + dx) + ',' + (gy + dy)) === 'wall';
+      const n = has(0, -1), s = has(0, 1), w = has(-1, 0), e = has(1, 0);
+      const t = GRID_SIZE * 0.32; // толщина стены внутри клетки
+      ctx.fillStyle = colors.dark;
+      // центральный блок стены
+      ctx.fillRect(px + GRID_SIZE / 2 - t / 2, py + GRID_SIZE / 2 - t / 2, t, t);
+      if (n) ctx.fillRect(px + GRID_SIZE / 2 - t / 2, py, t, GRID_SIZE / 2 + t / 2);
+      if (s) ctx.fillRect(px + GRID_SIZE / 2 - t / 2, py + GRID_SIZE / 2 - t / 2, t, GRID_SIZE / 2 + t / 2);
+      if (w) ctx.fillRect(px, py + GRID_SIZE / 2 - t / 2, GRID_SIZE / 2 + t / 2, t);
+      if (e) ctx.fillRect(px + GRID_SIZE / 2 - t / 2, py + GRID_SIZE / 2 - t / 2, GRID_SIZE / 2 + t / 2, t);
+      // кладка - горизонтальные швы
+      ctx.strokeStyle = colors.light;
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = 0.6;
+      for (let yy = py + 4; yy < py + GRID_SIZE; yy += 6) {
+        ctx.beginPath();
+        ctx.moveTo(px, yy);
+        ctx.lineTo(px + GRID_SIZE, yy);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      // зубцы на верхнем открытом крае (не соединён с соседом сверху)
+      if (!n) {
+        ctx.fillStyle = colors.dark;
+        for (let bx = px + 2; bx < px + GRID_SIZE - 2; bx += 8) {
+          ctx.fillRect(bx, py + GRID_SIZE / 2 - t / 2 - 3, 5, 3);
+        }
+      }
+      ctx.restore();
+      return;
+    }
     if (type === 'grass' || type === 'swamp') {
       ctx.strokeStyle = colors.dark;
       ctx.globalAlpha = 0.35;
@@ -50,10 +83,7 @@
         const bx = px + 4 + seed(i) * (GRID_SIZE - 8);
         const by = py + 4 + seed(i + 10) * (GRID_SIZE - 8);
         const r = 4 + seed(i + 20) * 3;
-        const g = ctx.createRadialGradient(bx - r * 0.3, by - r * 0.3, 0, bx, by, r);
-        g.addColorStop(0, colors.light);
-        g.addColorStop(1, colors.dark);
-        ctx.fillStyle = g;
+        ctx.fillStyle = colors.dark;
         ctx.beginPath();
         ctx.arc(bx, by, r, 0, Math.PI * 2);
         ctx.fill();
@@ -137,7 +167,6 @@
       { id: 'house6', name: 'Дом с забором', drawIcon: drawHouseWithFence, footprint: 3 },
       { id: 'watchtower', name: 'Сторожевая башня', drawIcon: drawWatchtower, footprint: 2 },
       { id: 'castle', name: 'Замок', drawIcon: drawCastle, footprint: 5 },
-      { id: 'citywall', name: 'Городская стена', drawIcon: drawCityWall, footprint: 1 },
       { id: 'gate', name: 'Городские ворота', drawIcon: drawCityGate, footprint: 2 },
       { id: 'market', name: 'Рынок', drawIcon: drawMarketStall, footprint: 2 },
       { id: 'well', name: 'Колодец', drawIcon: drawWell, footprint: 1 },
@@ -185,7 +214,8 @@
     mapHeight: 50,
     terrain: new Map(),
     props: [],
-    selectedProp: null,
+    selectedProp: -1,
+    tool: 'paint',
     selectedTerrainType: 'grass',
     brushSize: 20,
     currentMode: 'town',
@@ -489,36 +519,33 @@
   }
   
   function drawForge(ctx) {
-    // Кузница: крыша сверху (вид строго сверху) + дымоход, горн и наковальня во дворе
+    // Кузница: крыша сверху (вид строго сверху), дымоход/горн/наковальня внутри контура крыши
     drawGableRoofTop(ctx, 8, 6, 'h', '#7a6a5c', '#564738', '#332a20');
     drawDoorNotch(ctx, 0, 6, true);
 
-    // Дымовая труба с дымом
+    // Дымоход (в пределах крыши, у конька)
     ctx.fillStyle = '#4a3c30';
-    ctx.fillRect(5, -9, 4, 3.5);
-    ctx.fillStyle = 'rgba(120,120,120,0.5)';
-    ctx.beginPath();
-    ctx.arc(7, -11, 2, 0, Math.PI * 2);
-    ctx.arc(9, -14, 2.4, 0, Math.PI * 2);
-    ctx.arc(6, -17, 1.8, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(4.5, -1, 3, 3);
+    ctx.strokeStyle = '#2a2018';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(4.5, -1, 3, 3);
 
-    // Открытый горн со свечением (во дворе, виден сверху)
+    // Открытый горн со свечением (виден сверху, в левой части крыши)
     ctx.fillStyle = '#2a2420';
-    ctx.fillRect(-11, 2, 6, 6);
-    const fireGrad = ctx.createRadialGradient(-8, 5, 0, -8, 5, 3);
-    fireGrad.addColorStop(0, '#ffdd55');
-    fireGrad.addColorStop(0.5, '#ff6a1f');
-    fireGrad.addColorStop(1, 'rgba(255,60,0,0)');
-    ctx.fillStyle = fireGrad;
+    ctx.fillRect(-7, -4, 4.5, 4.5);
+    ctx.fillStyle = '#ff6a1f';
     ctx.beginPath();
-    ctx.arc(-8, 5, 3, 0, Math.PI * 2);
+    ctx.arc(-4.75, -1.75, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffdd55';
+    ctx.beginPath();
+    ctx.arc(-4.75, -1.75, 0.7, 0, Math.PI * 2);
     ctx.fill();
 
-    // Наковальня во дворе
+    // Наковальня (правая часть крыши)
     ctx.fillStyle = '#2f2f2f';
-    ctx.fillRect(4, 7, 6, 2.2);
-    ctx.fillRect(6, 4.5, 2, 2.2);
+    ctx.fillRect(2, 2, 5, 1.8);
+    ctx.fillRect(3.7, 0.3, 1.6, 1.8);
   }
   
   function drawCityWall(ctx) {
@@ -1415,11 +1442,7 @@
       const py = gy * GRID_SIZE;
 
       const colors = TERRAIN_TYPES[terrain];
-      const grad = ctx.createLinearGradient(px, py, px + GRID_SIZE, py + GRID_SIZE);
-      grad.addColorStop(0, colors.light);
-      grad.addColorStop(0.5, colors.color);
-      grad.addColorStop(1, colors.dark);
-      ctx.fillStyle = grad;
+      ctx.fillStyle = colors.color;
       ctx.fillRect(px, py, GRID_SIZE, GRID_SIZE);
 
       drawTerrainTexture(ctx, gx, gy, px, py, terrain, colors);
@@ -1461,6 +1484,11 @@
       }
     }
 
+    // Рамка границы карты
+    ctx.strokeStyle = '#d4a52a';
+    ctx.lineWidth = 3 / state.zoom;
+    ctx.strokeRect(0, 0, state.mapWidth * GRID_SIZE, state.mapHeight * GRID_SIZE);
+
     for (let i = 0; i < state.props.length; i++) {
       const prop = state.props[i];
       const px = prop.x;
@@ -1482,15 +1510,18 @@
         propDef.drawIcon(ctx);
       }
 
-      if (state.selectedProp === i) {
-        const path = new Path2D();
-        path.rect(-15, -15, 30, 30);
-        ctx.strokeStyle = '#0066cc';
-        ctx.lineWidth = 2 / state.zoom;
-        ctx.stroke(path);
-      }
-
       ctx.restore();
+
+      if (state.selectedProp === i) {
+        const halfPx = (footprint * GRID_SIZE) / 2 + 2;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.strokeStyle = '#2ee6a0';
+        ctx.lineWidth = 2 / state.zoom;
+        ctx.setLineDash([4 / state.zoom, 3 / state.zoom]);
+        ctx.strokeRect(-halfPx, -halfPx, halfPx * 2, halfPx * 2);
+        ctx.restore();
+      }
     }
 
     ctx.restore();
@@ -1509,6 +1540,36 @@
 
   let isMouseDown = false;
   let paintHistory = false;
+  let isDraggingProp = false;
+  let dragOffset = { x: 0, y: 0 };
+
+  function hitTestProp(worldX, worldY) {
+    // Ищем верхний (последний нарисованный) объект под курсором
+    for (let i = state.props.length - 1; i >= 0; i--) {
+      const prop = state.props[i];
+      const propDef = findPropDefinition(prop.propId);
+      const footprint = (propDef && propDef.footprint) || 1;
+      const half = (footprint * GRID_SIZE) / 2;
+      if (Math.abs(worldX - prop.x) <= half && Math.abs(worldY - prop.y) <= half) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function removeOverlappingProps(x, y, footprint) {
+    const half = (footprint * GRID_SIZE) / 2;
+    for (let i = state.props.length - 1; i >= 0; i--) {
+      const other = state.props[i];
+      const otherDef = findPropDefinition(other.propId);
+      const otherFootprint = (otherDef && otherDef.footprint) || 1;
+      const otherHalf = (otherFootprint * GRID_SIZE) / 2;
+      const dist = Math.hypot(x - other.x, y - other.y);
+      if (dist < (half + otherHalf) * 0.55) {
+        state.props.splice(i, 1);
+      }
+    }
+  }
 
   canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -1520,7 +1581,16 @@
     if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
       state.panStart = { x: canvasX, y: canvasY };
     } else if (e.button === 0) {
-      if (state.selectedPropId) {
+      if (state.tool === 'select') {
+        const hit = hitTestProp(worldX, worldY);
+        state.selectedProp = hit;
+        if (hit >= 0) {
+          isDraggingProp = true;
+          dragOffset.x = worldX - state.props[hit].x;
+          dragOffset.y = worldY - state.props[hit].y;
+        }
+        render();
+      } else if (state.selectedPropId) {
         const propDef = findPropDefinition(state.selectedPropId);
         const footprint = (propDef && propDef.footprint) || 1;
         let px, py;
@@ -1533,6 +1603,8 @@
           px = worldX;
           py = worldY;
         }
+        // Не даём объектам накладываться друг на друга - убираем то, что было на этом месте
+        removeOverlappingProps(px, py, footprint);
         state.props.push({
           propId: state.selectedPropId,
           x: px,
@@ -1566,6 +1638,16 @@
       state.panX += dx;
       state.panY += dy;
       state.panStart = { x: canvasX, y: canvasY };
+    } else if (isDraggingProp && state.selectedProp >= 0) {
+      const prop = state.props[state.selectedProp];
+      let nx = worldX - dragOffset.x;
+      let ny = worldY - dragOffset.y;
+      if (state.snapToGrid) {
+        nx = Math.round(nx / GRID_SIZE) * GRID_SIZE;
+        ny = Math.round(ny / GRID_SIZE) * GRID_SIZE;
+      }
+      prop.x = nx;
+      prop.y = ny;
     } else if (isMouseDown) {
       paintTerrain(worldX, worldY);
     }
@@ -1577,6 +1659,10 @@
     if (isMouseDown && paintHistory) {
       saveHistory();
       paintHistory = false;
+    }
+    if (isDraggingProp) {
+      isDraggingProp = false;
+      saveHistory();
     }
     isMouseDown = false;
   });
@@ -1695,6 +1781,8 @@
       btn.classList.add('active');
       state.selectedTerrainType = btn.dataset.terrain;
       state.selectedPropId = null;
+      state.tool = 'paint';
+      document.getElementById('btnSelectTool').classList.remove('active');
     });
   });
 
@@ -1712,6 +1800,51 @@
   document.getElementById('btnSnap').addEventListener('click', () => {
     state.snapToGrid = !state.snapToGrid;
     document.getElementById('btnSnap').classList.toggle('active', state.snapToGrid);
+  });
+
+  document.getElementById('btnSelectTool').addEventListener('click', () => {
+    state.tool = state.tool === 'select' ? 'paint' : 'select';
+    document.getElementById('btnSelectTool').classList.toggle('active', state.tool === 'select');
+    if (state.tool === 'select') {
+      state.selectedPropId = null;
+      document.querySelectorAll('.prop-icon').forEach(p => p.classList.remove('selected'));
+    }
+    render();
+  });
+
+  function deleteSelectedProp() {
+    if (state.selectedProp >= 0 && state.selectedProp < state.props.length) {
+      state.props.splice(state.selectedProp, 1);
+      state.selectedProp = -1;
+      saveHistory();
+      render();
+    }
+  }
+
+  function rotateSelectedProp() {
+    if (state.selectedProp >= 0 && state.selectedProp < state.props.length) {
+      const prop = state.props[state.selectedProp];
+      prop.rotation = (prop.rotation + 90) % 360;
+      saveHistory();
+      render();
+    }
+  }
+
+  document.getElementById('btnDelete').addEventListener('click', deleteSelectedProp);
+  document.getElementById('btnRotate').addEventListener('click', rotateSelectedProp);
+
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      deleteSelectedProp();
+    } else if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
+      rotateSelectedProp();
+    } else if (e.key === 'Escape') {
+      state.selectedProp = -1;
+      render();
+    }
   });
 
   document.getElementById('modeSelector').addEventListener('change', (e) => {
@@ -1781,11 +1914,7 @@
       const px = gx * GRID_SIZE;
       const py = gy * GRID_SIZE;
       const colors = TERRAIN_TYPES[terrain];
-      const grad = exportCtx.createLinearGradient(px, py, px + GRID_SIZE, py + GRID_SIZE);
-      grad.addColorStop(0, colors.light);
-      grad.addColorStop(0.5, colors.color);
-      grad.addColorStop(1, colors.dark);
-      exportCtx.fillStyle = grad;
+      exportCtx.fillStyle = colors.color;
       exportCtx.fillRect(px, py, GRID_SIZE, GRID_SIZE);
       drawTerrainTexture(exportCtx, gx, gy, px, py, terrain, colors);
     }
@@ -1870,6 +1999,8 @@
       btn.addEventListener('click', () => {
         state.selectedPropId = propDef.id;
         state.selectedTerrainType = null;
+        state.tool = 'paint';
+        document.getElementById('btnSelectTool').classList.remove('active');
         document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.prop-icon').forEach(p => p.classList.remove('selected'));
         btn.classList.add('selected');
