@@ -7,7 +7,7 @@
   const TERRAIN_TYPES = {
     grass: { color: '#4f9153', light: '#6cb66a', dark: '#2f5e34', label: 'Трава' },
     forest: { color: '#285c30', light: '#3f7a3f', dark: '#163a1c', label: 'Лес' },
-    mountain: { color: '#7c7266', light: '#a6998a', dark: '#4a443c', label: 'Гора' },
+    mountain: { color: '#8a7358', light: '#c9b38a', dark: '#4a3a28', label: 'Гора' },
     water: { color: '#2d6fa8', light: '#4a94c9', dark: '#164a73', label: 'Вода' },
     sand: { color: '#dcc180', light: '#ecd9a0', dark: '#b89a5c', label: 'Песок' },
     snow: { color: '#e9edf0', light: '#ffffff', dark: '#c6d1d8', label: 'Снег' },
@@ -89,23 +89,64 @@
         ctx.fill();
       }
     } else if (type === 'mountain') {
-      ctx.fillStyle = colors.dark;
-      ctx.globalAlpha = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(px + GRID_SIZE * 0.2, py + GRID_SIZE * 0.85);
-      ctx.lineTo(px + GRID_SIZE * 0.5, py + GRID_SIZE * 0.25);
-      ctx.lineTo(px + GRID_SIZE * 0.8, py + GRID_SIZE * 0.85);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = '#ffffff';
-      ctx.globalAlpha = 0.85;
-      ctx.beginPath();
-      ctx.moveTo(px + GRID_SIZE * 0.42, py + GRID_SIZE * 0.42);
-      ctx.lineTo(px + GRID_SIZE * 0.5, py + GRID_SIZE * 0.25);
-      ctx.lineTo(px + GRID_SIZE * 0.58, py + GRID_SIZE * 0.42);
-      ctx.closePath();
-      ctx.fill();
+      // Civ6-стиль: кластер гранёных остроконечных пиков со снежными шапками,
+      // плоские грани света/тени (без градиентов) - рельефный, но не "глянцевый"
+      const cx = px + GRID_SIZE / 2;
+      const base = py + GRID_SIZE * 0.92;
+
+      // Три перекрывающихся пика разной высоты - задний меньше, передние крупнее
+      const peaks = [
+        { x: px + GRID_SIZE * 0.28, h: 0.62, w: 0.42 },
+        { x: px + GRID_SIZE * 0.70, h: 0.52, w: 0.4 },
+        { x: px + GRID_SIZE * 0.5, h: 0.82, w: 0.5 }
+      ];
+
+      for (const pk of peaks) {
+        const topY = py + GRID_SIZE * (1 - pk.h);
+        const halfW = GRID_SIZE * pk.w / 2;
+        const leftX = pk.x - halfW;
+        const rightX = pk.x + halfW;
+
+        // Освещённая грань (левая/передняя) - светлый тан
+        ctx.fillStyle = colors.light;
+        ctx.beginPath();
+        ctx.moveTo(pk.x, topY);
+        ctx.lineTo(leftX, base);
+        ctx.lineTo(pk.x, base);
+        ctx.closePath();
+        ctx.fill();
+
+        // Теневая грань (правая) - тёмно-коричневая, плоская (без градиента)
+        ctx.fillStyle = colors.dark;
+        ctx.beginPath();
+        ctx.moveTo(pk.x, topY);
+        ctx.lineTo(pk.x, base);
+        ctx.lineTo(rightX, base);
+        ctx.closePath();
+        ctx.fill();
+
+        // Контур граней
+        ctx.strokeStyle = 'rgba(30,20,10,0.5)';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(leftX, base);
+        ctx.lineTo(pk.x, topY);
+        ctx.lineTo(rightX, base);
+        ctx.stroke();
+
+        // Снежная шапка на самом высоком пике
+        if (pk.h > 0.65) {
+          const snowH = GRID_SIZE * pk.h * 0.28;
+          const snowHalfW = halfW * 0.4;
+          ctx.fillStyle = '#eef2f0';
+          ctx.beginPath();
+          ctx.moveTo(pk.x, topY);
+          ctx.lineTo(pk.x - snowHalfW, topY + snowH);
+          ctx.lineTo(pk.x + snowHalfW * 0.6, topY + snowH * 0.9);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
     } else if (type === 'water') {
       ctx.strokeStyle = colors.light;
       ctx.globalAlpha = 0.5;
