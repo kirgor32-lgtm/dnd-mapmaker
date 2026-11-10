@@ -1618,6 +1618,7 @@
         isMouseDown = true;
         paintTerrain(worldX, worldY);
         paintHistory = true;
+        render();
       }
     }
   });
