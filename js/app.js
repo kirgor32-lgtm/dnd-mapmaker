@@ -346,6 +346,7 @@
     terrain: new Map(),
     props: [],
     selectedProp: -1,
+    selectedProps: [],
     tool: 'paint',
     selectedTerrainType: 'grass',
     brushSize: 20,
@@ -1555,6 +1556,28 @@
     }
   }
 
+  function eraseTerrain(px, py) {
+    // Ластик: убирает рельеф под кистью (клетка становится пустой/базовой землёй)
+    const centerGx = Math.floor(px / GRID_SIZE);
+    const centerGy = Math.floor(py / GRID_SIZE);
+    const radiusCells = state.brushSize / GRID_SIZE;
+
+    if (radiusCells <= 0.5) {
+      state.terrain.delete(centerGx + ',' + centerGy);
+      return;
+    }
+
+    const spanCells = Math.ceil(radiusCells);
+    for (let gx = centerGx - spanCells; gx <= centerGx + spanCells; gx++) {
+      for (let gy = centerGy - spanCells; gy <= centerGy + spanCells; gy++) {
+        const dist = Math.hypot(gx - centerGx, gy - centerGy);
+        if (dist <= radiusCells) {
+          state.terrain.delete(gx + ',' + gy);
+        }
+      }
+    }
+  }
+
   function render() {
     const width = canvas.width;
     const height = canvas.height;
@@ -1643,7 +1666,7 @@
 
       ctx.restore();
 
-      if (state.selectedProp === i) {
+      if (state.selectedProps.includes(i)) {
         const halfPx = (footprint * GRID_SIZE) / 2 + 2;
         ctx.save();
         ctx.translate(px, py);
@@ -1652,22 +1675,40 @@
         ctx.setLineDash([4 / state.zoom, 3 / state.zoom]);
         ctx.strokeRect(-halfPx, -halfPx, halfPx * 2, halfPx * 2);
         ctx.setLineDash([]);
-        // Рукоятка поворота: линия вверх + кружок на конце (тащи, чтобы повернуть свободно)
-        const handleDist = halfPx + 18 / state.zoom;
-        ctx.rotate((prop.rotation * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.moveTo(0, -halfPx);
-        ctx.lineTo(0, -handleDist);
-        ctx.stroke();
-        ctx.fillStyle = '#2ee6a0';
-        ctx.beginPath();
-        ctx.arc(0, -handleDist, 6 / state.zoom, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#163a2b';
-        ctx.lineWidth = 1.5 / state.zoom;
-        ctx.stroke();
+        // Рукоятку поворота показываем только когда выбран один объект
+        if (state.selectedProps.length === 1) {
+          const handleDist = halfPx + 18 / state.zoom;
+          ctx.rotate((prop.rotation * Math.PI) / 180);
+          ctx.beginPath();
+          ctx.moveTo(0, -halfPx);
+          ctx.lineTo(0, -handleDist);
+          ctx.stroke();
+          ctx.fillStyle = '#2ee6a0';
+          ctx.beginPath();
+          ctx.arc(0, -handleDist, 6 / state.zoom, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#163a2b';
+          ctx.lineWidth = 1.5 / state.zoom;
+          ctx.stroke();
+        }
         ctx.restore();
       }
+    }
+
+    // Прямоугольник выделения области (маркиз) - рисуется поверх всего, в мировых координатах
+    if (isMarqueeSelecting) {
+      const x1 = Math.min(marqueeStart.x, marqueeEnd.x);
+      const y1 = Math.min(marqueeStart.y, marqueeEnd.y);
+      const w = Math.abs(marqueeEnd.x - marqueeStart.x);
+      const h = Math.abs(marqueeEnd.y - marqueeStart.y);
+      ctx.save();
+      ctx.fillStyle = 'rgba(46, 230, 160, 0.12)';
+      ctx.fillRect(x1, y1, w, h);
+      ctx.strokeStyle = '#2ee6a0';
+      ctx.lineWidth = 1.5 / state.zoom;
+      ctx.setLineDash([5 / state.zoom, 4 / state.zoom]);
+      ctx.strokeRect(x1, y1, w, h);
+      ctx.restore();
     }
 
     ctx.restore();
@@ -1688,6 +1729,9 @@
   let paintHistory = false;
   let isDraggingProp = false;
   let isRotatingProp = false;
+  let isMarqueeSelecting = false;
+  let marqueeStart = { x: 0, y: 0 };
+  let marqueeEnd = { x: 0, y: 0 };
   let dragOffset = { x: 0, y: 0 };
 
   function getRotateHandlePos(prop, footprint) {
@@ -1739,8 +1783,8 @@
       state.panStart = { x: canvasX, y: canvasY };
     } else if (e.button === 0) {
       if (state.tool === 'select') {
-        // Если объект уже выбран - сначала проверяем, не кликнули ли по рукоятке поворота
-        if (state.selectedProp >= 0 && state.props[state.selectedProp]) {
+        // Если объект уже выбран (и ровно один) - сначала проверяем клик по рукоятке поворота
+        if (state.selectedProps.length === 1 && state.props[state.selectedProp]) {
           const curProp = state.props[state.selectedProp];
           const curDef = findPropDefinition(curProp.propId);
           const curFootprint = (curDef && curDef.footprint) || 1;
@@ -1753,12 +1797,37 @@
           }
         }
         const hit = hitTestProp(worldX, worldY);
-        state.selectedProp = hit;
         if (hit >= 0) {
+          // Точечное выделение одного объекта (shift - добавить/снять из набора)
+          if (e.shiftKey) {
+            const idx = state.selectedProps.indexOf(hit);
+            if (idx >= 0) {
+              state.selectedProps.splice(idx, 1);
+            } else {
+              state.selectedProps.push(hit);
+            }
+          } else if (!state.selectedProps.includes(hit)) {
+            state.selectedProps = [hit];
+          }
+          state.selectedProp = hit;
           isDraggingProp = true;
           dragOffset.x = worldX - state.props[hit].x;
           dragOffset.y = worldY - state.props[hit].y;
+        } else {
+          // Клик по пустому месту - начинаем выделение области (маркиз)
+          if (!e.shiftKey) {
+            state.selectedProps = [];
+            state.selectedProp = -1;
+          }
+          isMarqueeSelecting = true;
+          marqueeStart = { x: worldX, y: worldY };
+          marqueeEnd = { x: worldX, y: worldY };
         }
+        render();
+      } else if (state.tool === 'erase') {
+        isMouseDown = true;
+        eraseTerrain(worldX, worldY);
+        paintHistory = true;
         render();
       } else if (state.selectedPropId) {
         const propDef = findPropDefinition(state.selectedPropId);
@@ -1817,16 +1886,30 @@
         nx = Math.round(nx / GRID_SIZE) * GRID_SIZE;
         ny = Math.round(ny / GRID_SIZE) * GRID_SIZE;
       }
-      prop.x = nx;
-      prop.y = ny;
+      const dx = nx - prop.x;
+      const dy = ny - prop.y;
+      // Двигаем все выделенные объекты группой, если выбрано несколько
+      const group = state.selectedProps.length > 1 ? state.selectedProps : [state.selectedProp];
+      for (const idx of group) {
+        if (state.props[idx]) {
+          state.props[idx].x += dx;
+          state.props[idx].y += dy;
+        }
+      }
     } else if (isRotatingProp && state.selectedProp >= 0) {
       const prop = state.props[state.selectedProp];
       const angleRad = Math.atan2(worldX - prop.x, -(worldY - prop.y));
       let deg = (angleRad * 180) / Math.PI;
       if (state.snapToGrid) deg = Math.round(deg / 15) * 15; // привязка - шаг 15°
       prop.rotation = ((deg % 360) + 360) % 360;
+    } else if (isMarqueeSelecting) {
+      marqueeEnd = { x: worldX, y: worldY };
     } else if (isMouseDown) {
-      paintTerrain(worldX, worldY);
+      if (state.tool === 'erase') {
+        eraseTerrain(worldX, worldY);
+      } else {
+        paintTerrain(worldX, worldY);
+      }
     }
 
     render();
@@ -1844,6 +1927,28 @@
     if (isRotatingProp) {
       isRotatingProp = false;
       saveHistory();
+    }
+    if (isMarqueeSelecting) {
+      isMarqueeSelecting = false;
+      const x1 = Math.min(marqueeStart.x, marqueeEnd.x);
+      const x2 = Math.max(marqueeStart.x, marqueeEnd.x);
+      const y1 = Math.min(marqueeStart.y, marqueeEnd.y);
+      const y2 = Math.max(marqueeStart.y, marqueeEnd.y);
+      if (Math.hypot(marqueeEnd.x - marqueeStart.x, marqueeEnd.y - marqueeStart.y) > 3 / state.zoom) {
+        // Выделение области - все объекты, центр которых попал в прямоугольник
+        const found = [];
+        for (let i = 0; i < state.props.length; i++) {
+          const p = state.props[i];
+          if (p.x >= x1 && p.x <= x2 && p.y >= y1 && p.y <= y2) found.push(i);
+        }
+        if (e.shiftKey) {
+          for (const idx of found) if (!state.selectedProps.includes(idx)) state.selectedProps.push(idx);
+        } else {
+          state.selectedProps = found;
+        }
+        state.selectedProp = state.selectedProps.length ? state.selectedProps[state.selectedProps.length - 1] : -1;
+      }
+      render();
     }
     isMouseDown = false;
   });
@@ -1910,9 +2015,16 @@
   }
 
   function duplicateSelectedProp() {
-    if (state.selectedProp !== null) {
-      const prop = state.props[state.selectedProp];
-      state.props.push({ ...prop, x: prop.x + GRID_SIZE, y: prop.y + GRID_SIZE });
+    if (state.selectedProps.length) {
+      const newIndices = [];
+      for (const idx of state.selectedProps) {
+        const prop = state.props[idx];
+        if (!prop) continue;
+        state.props.push({ ...prop, x: prop.x + GRID_SIZE, y: prop.y + GRID_SIZE });
+        newIndices.push(state.props.length - 1);
+      }
+      state.selectedProps = newIndices;
+      state.selectedProp = newIndices.length ? newIndices[newIndices.length - 1] : -1;
       saveHistory();
       render();
     }
@@ -1942,11 +2054,19 @@
     btn.addEventListener('click', () => {
       document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.getElementById('btnEraser').classList.remove('active');
       state.selectedTerrainType = btn.dataset.terrain;
       state.selectedPropId = null;
       state.tool = 'paint';
       document.getElementById('btnSelectTool').classList.remove('active');
     });
+  });
+
+  document.getElementById('btnEraser').addEventListener('click', () => {
+    document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btnSelectTool').classList.remove('active');
+    document.getElementById('btnEraser').classList.add('active');
+    state.tool = 'erase';
   });
 
   document.getElementById('brushSize').addEventListener('input', (e) => {
@@ -1968,6 +2088,7 @@
   document.getElementById('btnSelectTool').addEventListener('click', () => {
     state.tool = state.tool === 'select' ? 'paint' : 'select';
     document.getElementById('btnSelectTool').classList.toggle('active', state.tool === 'select');
+    document.getElementById('btnEraser').classList.remove('active');
     if (state.tool === 'select') {
       state.selectedPropId = null;
       document.querySelectorAll('.prop-icon').forEach(p => p.classList.remove('selected'));
@@ -1976,8 +2097,12 @@
   });
 
   function deleteSelectedProp() {
-    if (state.selectedProp >= 0 && state.selectedProp < state.props.length) {
-      state.props.splice(state.selectedProp, 1);
+    if (state.selectedProps.length) {
+      const toDelete = [...state.selectedProps].sort((a, b) => b - a);
+      for (const idx of toDelete) {
+        state.props.splice(idx, 1);
+      }
+      state.selectedProps = [];
       state.selectedProp = -1;
       saveHistory();
       render();
@@ -1986,9 +2111,11 @@
 
   function rotateSelectedProp(degrees) {
     const step = typeof degrees === 'number' ? degrees : 90;
-    if (state.selectedProp >= 0 && state.selectedProp < state.props.length) {
-      const prop = state.props[state.selectedProp];
-      prop.rotation = ((prop.rotation + step) % 360 + 360) % 360;
+    if (state.selectedProps.length) {
+      for (const idx of state.selectedProps) {
+        const prop = state.props[idx];
+        if (prop) prop.rotation = ((prop.rotation + step) % 360 + 360) % 360;
+      }
       saveHistory();
       render();
     }
@@ -2165,6 +2292,7 @@
         state.selectedTerrainType = null;
         state.tool = 'paint';
         document.getElementById('btnSelectTool').classList.remove('active');
+        document.getElementById('btnEraser').classList.remove('active');
         document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.prop-icon').forEach(p => p.classList.remove('selected'));
         btn.classList.add('selected');
