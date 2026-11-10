@@ -2025,6 +2025,7 @@
 
   function init() {
     resizeCanvasToDisplaySize();
+    window.__debugState = state; // временный хук для диагностики, убрать перед финальным релизом
     saveHistory();
     updatePropPalette();
     updateHistoryButtons();
