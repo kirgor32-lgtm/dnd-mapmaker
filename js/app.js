@@ -66,9 +66,30 @@
       ctx.restore();
       return;
     }
-    if (type === 'grass' || type === 'swamp') {
+    // Общий помощник: гранёный многоугольник (low-poly facet), заливка плоским цветом
+    function facet(points, fill) {
+      ctx.fillStyle = fill;
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    if (type === 'grass') {
+      // Civ6-стиль: светлые плоские пятна-заплатки поверх базовой травы + штрихи-травинки
+      for (let i = 0; i < 3; i++) {
+        const bx = px + seed(i + 30) * GRID_SIZE;
+        const by = py + seed(i + 40) * GRID_SIZE;
+        const r = 4 + seed(i + 50) * 4;
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = colors.light;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, r, r * 0.6, seed(i) * Math.PI, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 0.4;
       ctx.strokeStyle = colors.dark;
-      ctx.globalAlpha = 0.35;
       ctx.lineWidth = 1;
       for (let i = 0; i < 7; i++) {
         const bx = px + seed(i) * GRID_SIZE;
@@ -78,74 +99,87 @@
         ctx.lineTo(bx + (seed(i + 20) - 0.5) * 3, by - 3);
         ctx.stroke();
       }
-    } else if (type === 'forest') {
+    } else if (type === 'swamp') {
+      // Мутные тёмные лужи + светлые бликующие заплатки + редкие камыши
       for (let i = 0; i < 4; i++) {
-        const bx = px + 4 + seed(i) * (GRID_SIZE - 8);
-        const by = py + 4 + seed(i + 10) * (GRID_SIZE - 8);
-        const r = 4 + seed(i + 20) * 3;
+        const bx = px + 3 + seed(i + 5) * (GRID_SIZE - 6);
+        const by = py + 3 + seed(i + 15) * (GRID_SIZE - 6);
+        const r = 3 + seed(i + 25) * 3;
+        ctx.globalAlpha = 0.5;
         ctx.fillStyle = colors.dark;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, r, r * 0.7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#5c7a52';
+      for (let i = 0; i < 2; i++) {
+        const bx = px + seed(i + 45) * GRID_SIZE;
+        const by = py + seed(i + 55) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, 3, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = colors.light;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 2; i++) {
+        const bx = px + seed(i + 60) * GRID_SIZE;
+        const by = py + GRID_SIZE * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + 1, by - 8);
+        ctx.stroke();
+      }
+    } else if (type === 'forest') {
+      // Civ6-стиль: плотный кластер округлых кроны деревьев, покрывающий почти всю клетку
+      for (let i = 0; i < 6; i++) {
+        const bx = px + 2 + seed(i) * (GRID_SIZE - 4);
+        const by = py + 2 + seed(i + 10) * (GRID_SIZE - 4);
+        const r = 4.5 + seed(i + 20) * 3.5;
+        ctx.fillStyle = i % 3 === 0 ? colors.light : colors.dark;
         ctx.beginPath();
         ctx.arc(bx, by, r, 0, Math.PI * 2);
         ctx.fill();
       }
     } else if (type === 'mountain') {
-      // Civ6-стиль: кластер гранёных остроконечных пиков со снежными шапками,
-      // плоские грани света/тени (без градиентов) - рельефный, но не "глянцевый"
+      // Civ6-стиль top-down: гранёный каменный кластер (не силуэт горы "сбоку"),
+      // полностью покрывает клетку плоскими гранями без фона, со снежной крошкой на части граней
       const cx = px + GRID_SIZE / 2;
-      const base = py + GRID_SIZE * 0.92;
-
-      // Три перекрывающихся пика разной высоты - задний меньше, передние крупнее
-      const peaks = [
-        { x: px + GRID_SIZE * 0.28, h: 0.62, w: 0.42 },
-        { x: px + GRID_SIZE * 0.70, h: 0.52, w: 0.4 },
-        { x: px + GRID_SIZE * 0.5, h: 0.82, w: 0.5 }
-      ];
-
-      for (const pk of peaks) {
-        const topY = py + GRID_SIZE * (1 - pk.h);
-        const halfW = GRID_SIZE * pk.w / 2;
-        const leftX = pk.x - halfW;
-        const rightX = pk.x + halfW;
-
-        // Освещённая грань (левая/передняя) - светлый тан
-        ctx.fillStyle = colors.light;
+      const cy = py + GRID_SIZE / 2;
+      const shades = [colors.light, colors.color, colors.dark, colors.light, colors.dark, colors.color];
+      const nFacets = 6;
+      for (let i = 0; i < nFacets; i++) {
+        const a1 = (i / nFacets) * Math.PI * 2 + (seed(i) - 0.5) * 0.5;
+        const a2 = ((i + 1) / nFacets) * Math.PI * 2 + (seed(i + 1) - 0.5) * 0.5;
+        const r1 = GRID_SIZE * (0.55 + seed(i + 30) * 0.2);
+        const r2 = GRID_SIZE * (0.55 + seed(i + 1 + 30) * 0.2);
+        facet([
+          [cx, cy],
+          [cx + Math.cos(a1) * r1, cy + Math.sin(a1) * r1],
+          [cx + Math.cos(a2) * r2, cy + Math.sin(a2) * r2]
+        ], shades[i % shades.length]);
+      }
+      // тёмные трещины между гранями
+      ctx.strokeStyle = 'rgba(25,18,10,0.45)';
+      ctx.lineWidth = 0.7;
+      for (let i = 0; i < nFacets; i++) {
+        const a1 = (i / nFacets) * Math.PI * 2 + (seed(i) - 0.5) * 0.5;
+        const r1 = GRID_SIZE * (0.55 + seed(i + 30) * 0.2);
         ctx.beginPath();
-        ctx.moveTo(pk.x, topY);
-        ctx.lineTo(leftX, base);
-        ctx.lineTo(pk.x, base);
-        ctx.closePath();
-        ctx.fill();
-
-        // Теневая грань (правая) - тёмно-коричневая, плоская (без градиента)
-        ctx.fillStyle = colors.dark;
-        ctx.beginPath();
-        ctx.moveTo(pk.x, topY);
-        ctx.lineTo(pk.x, base);
-        ctx.lineTo(rightX, base);
-        ctx.closePath();
-        ctx.fill();
-
-        // Контур граней
-        ctx.strokeStyle = 'rgba(30,20,10,0.5)';
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(leftX, base);
-        ctx.lineTo(pk.x, topY);
-        ctx.lineTo(rightX, base);
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a1) * r1, cy + Math.sin(a1) * r1);
         ctx.stroke();
-
-        // Снежная шапка на самом высоком пике
-        if (pk.h > 0.65) {
-          const snowH = GRID_SIZE * pk.h * 0.28;
-          const snowHalfW = halfW * 0.4;
-          ctx.fillStyle = '#eef2f0';
-          ctx.beginPath();
-          ctx.moveTo(pk.x, topY);
-          ctx.lineTo(pk.x - snowHalfW, topY + snowH);
-          ctx.lineTo(pk.x + snowHalfW * 0.6, topY + snowH * 0.9);
-          ctx.closePath();
-          ctx.fill();
-        }
+      }
+      // снежная крошка на части граней (иней/снег на вершинах - часть клеток, по сиду)
+      if (seed(99) > 0.4) {
+        const sa = seed(70) * Math.PI * 2;
+        const sr = GRID_SIZE * 0.3;
+        facet([
+          [cx, cy],
+          [cx + Math.cos(sa - 0.3) * sr, cy + Math.sin(sa - 0.3) * sr],
+          [cx + Math.cos(sa + 0.3) * sr, cy + Math.sin(sa + 0.3) * sr]
+        ], '#eef2f0');
       }
     } else if (type === 'water') {
       ctx.strokeStyle = colors.light;
@@ -158,17 +192,45 @@
         ctx.quadraticCurveTo(px + GRID_SIZE / 2, wy - 4, px + GRID_SIZE - 2, wy);
         ctx.stroke();
       }
+      ctx.globalAlpha = 0.6;
+      ctx.fillStyle = '#bfe3f5';
+      for (let i = 0; i < 2; i++) {
+        const bx = px + seed(i + 60) * GRID_SIZE;
+        const by = py + seed(i + 70) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.arc(bx, by, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (type === 'sand') {
-      ctx.fillStyle = colors.dark;
+      ctx.globalAlpha = 0.3;
+      ctx.strokeStyle = colors.dark;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 2; i++) {
+        const wy = py + 10 + i * 14 + seed(i + 5) * 4;
+        ctx.beginPath();
+        ctx.moveTo(px, wy);
+        ctx.quadraticCurveTo(px + GRID_SIZE / 2, wy + 6, px + GRID_SIZE, wy);
+        ctx.stroke();
+      }
       ctx.globalAlpha = 0.4;
+      ctx.fillStyle = colors.dark;
       for (let i = 0; i < 10; i++) {
         const bx = px + seed(i) * GRID_SIZE;
         const by = py + seed(i + 15) * GRID_SIZE;
         ctx.fillRect(bx, by, 1.5, 1.5);
       }
     } else if (type === 'snow') {
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = colors.dark;
+      for (let i = 0; i < 2; i++) {
+        const bx = px + seed(i + 40) * GRID_SIZE;
+        const by = py + seed(i + 50) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 0.85;
       ctx.fillStyle = '#ffffff';
-      ctx.globalAlpha = 0.8;
       for (let i = 0; i < 8; i++) {
         const bx = px + seed(i) * GRID_SIZE;
         const by = py + seed(i + 15) * GRID_SIZE;
@@ -176,22 +238,50 @@
         ctx.arc(bx, by, 0.8, 0, Math.PI * 2);
         ctx.fill();
       }
-    } else if (type === 'road' || type === 'dungeon' || type === 'wall') {
-      ctx.strokeStyle = colors.dark;
+    } else if (type === 'road') {
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = colors.light;
+      for (let i = 0; i < 3; i++) {
+        const bx = px + seed(i + 20) * GRID_SIZE;
+        const by = py + seed(i + 25) * GRID_SIZE;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, 4, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = colors.dark;
       ctx.lineWidth = 1;
       const rows = 3;
       for (let r = 0; r < rows; r++) {
         const by = py + (r + 1) * (GRID_SIZE / (rows + 1));
-        const offset = r % 2 === 0 ? 0 : GRID_SIZE / 2;
         ctx.beginPath();
         ctx.moveTo(px, by);
         ctx.lineTo(px + GRID_SIZE, by);
         ctx.stroke();
+      }
+    } else if (type === 'dungeon') {
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = colors.dark;
+      ctx.lineWidth = 1;
+      const bs = GRID_SIZE / 2;
+      for (let yy = 0; yy <= GRID_SIZE; yy += bs) {
         ctx.beginPath();
-        ctx.moveTo(px + offset, by - GRID_SIZE / (rows + 1));
-        ctx.lineTo(px + offset, by);
+        ctx.moveTo(px, py + yy);
+        ctx.lineTo(px + GRID_SIZE, py + yy);
         ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(px + bs, py);
+      ctx.lineTo(px + bs, py + bs);
+      ctx.moveTo(px + bs / 2, py + bs);
+      ctx.lineTo(px + bs / 2, py + GRID_SIZE);
+      ctx.stroke();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = colors.dark;
+      for (let i = 0; i < 4; i++) {
+        const bx = px + seed(i + 70) * GRID_SIZE;
+        const by = py + seed(i + 80) * GRID_SIZE;
+        ctx.fillRect(bx, by, 1.2, 1.2);
       }
     }
     ctx.globalAlpha = 1;
