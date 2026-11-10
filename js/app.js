@@ -1375,15 +1375,21 @@
   }
 
   function paintTerrain(px, py) {
-    const brushPixels = state.brushSize;
-    const brushCells = Math.ceil(brushPixels / GRID_SIZE) + 1;
     const centerGx = Math.floor(px / GRID_SIZE);
     const centerGy = Math.floor(py / GRID_SIZE);
+    const radiusCells = state.brushSize / GRID_SIZE;
 
-    for (let gx = centerGx - brushCells; gx <= centerGx + brushCells; gx++) {
-      for (let gy = centerGy - brushCells; gy <= centerGy + brushCells; gy++) {
-        const dist = Math.hypot(gx - centerGx + 0.5, gy - centerGy + 0.5);
-        if (dist < brushCells - 0.5) {
+    if (radiusCells <= 0.5) {
+      // Минимальная кисть - ровно одна клетка (можно рисовать линии 1x1)
+      state.terrain.set(centerGx + ',' + centerGy, state.selectedTerrainType);
+      return;
+    }
+
+    const spanCells = Math.ceil(radiusCells);
+    for (let gx = centerGx - spanCells; gx <= centerGx + spanCells; gx++) {
+      for (let gy = centerGy - spanCells; gy <= centerGy + spanCells; gy++) {
+        const dist = Math.hypot(gx - centerGx, gy - centerGy);
+        if (dist <= radiusCells) {
           const key = gx + ',' + gy;
           state.terrain.set(key, state.selectedTerrainType);
         }
@@ -1839,8 +1845,11 @@
   function updatePropPalette() {
     const palette = document.getElementById('propPalette');
     palette.innerHTML = '';
-    const currentCategory = state.currentMode === 'town' ? 'town' : 'dungeon';
-    const props = PROP_LIBRARY[currentCategory];
+    const activeTab = document.querySelector('.palette-tab.active');
+    const category = activeTab ? activeTab.dataset.tab : 'town';
+    const filterInput = document.getElementById('propFilter');
+    const query = filterInput ? filterInput.value.trim().toLowerCase() : '';
+    const props = PROP_LIBRARY[category].filter(p => !query || p.name.toLowerCase().includes(query));
     for (const propDef of props) {
       const btn = document.createElement('button');
       btn.className = 'prop-icon';
@@ -1873,47 +1882,19 @@
     tab.addEventListener('click', () => {
       document.querySelectorAll('.palette-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
+      updatePropPalette();
     });
   });
 
-  function populateAllPalettes() {
-    const palette = document.getElementById('propPalette');
-    palette.innerHTML = '';
-    for (const category of ['town', 'dungeon', 'nature']) {
-      const props = PROP_LIBRARY[category];
-      for (const propDef of props) {
-        const btn = document.createElement('button');
-        btn.className = 'prop-icon';
-        if (state.selectedPropId === propDef.id) {
-          btn.classList.add('selected');
-        }
-        
-        const iconCanvas = document.createElement('canvas');
-        renderPropIcon(iconCanvas, propDef);
-        
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'prop-name';
-        nameDiv.textContent = propDef.name;
-        
-        btn.appendChild(iconCanvas);
-        btn.appendChild(nameDiv);
-        
-        btn.addEventListener('click', () => {
-          state.selectedPropId = propDef.id;
-          state.selectedTerrainType = null;
-          document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.prop-icon').forEach(p => p.classList.remove('selected'));
-          btn.classList.add('selected');
-        });
-        palette.appendChild(btn);
-      }
-    }
+  const propFilterInput = document.getElementById('propFilter');
+  if (propFilterInput) {
+    propFilterInput.addEventListener('input', () => updatePropPalette());
   }
 
   function init() {
     resizeCanvasToDisplaySize();
     saveHistory();
-    populateAllPalettes();
+    updatePropPalette();
     updateHistoryButtons();
     const firstTerrainBtn = document.querySelector('.terrain-btn');
     if (firstTerrainBtn) {
