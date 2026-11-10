@@ -20,12 +20,22 @@ html, body {
   height: 100%;
 }
 
+/* Main area: canvas + side panels, fills space between toolbar and status bar */
+#mainArea {
+  flex: 1;
+  display: flex;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Canvas */
 #canvas {
   flex: 1;
   cursor: crosshair;
   background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
   display: block;
+  min-width: 0;
 }
 
 /* Toolbar */
@@ -37,6 +47,7 @@ html, body {
   gap: 16px;
   align-items: center;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .toolbar-group {
@@ -94,15 +105,12 @@ html, body {
 
 /* Left Panel - Terrain */
 .left-panel {
-  position: fixed;
-  left: 0;
-  top: 48px;
   width: 160px;
-  height: calc(100% - 48px - 30px);
+  flex-shrink: 0;
+  height: 100%;
   background: linear-gradient(90deg, #2a2a2a, #222);
   border-right: 1px solid #444;
   overflow-y: auto;
-  z-index: 100;
 }
 
 .panel-header {
@@ -173,15 +181,12 @@ html, body {
 
 /* Right Panel - Props */
 .right-panel {
-  position: fixed;
-  right: 0;
-  top: 48px;
   width: 200px;
-  height: calc(100% - 48px - 30px);
+  flex-shrink: 0;
+  height: 100%;
   background: linear-gradient(90deg, #222, #2a2a2a);
   border-left: 1px solid #444;
   overflow-y: auto;
-  z-index: 100;
 }
 
 .palette-controls {
@@ -285,10 +290,7 @@ html, body {
 
 /* Status Bar */
 .status-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   height: 30px;
   background: linear-gradient(180deg, #1f1f1f, #2a2a2a);
   border-top: 1px solid #444;
@@ -297,7 +299,6 @@ html, body {
   padding: 0 12px;
   align-items: center;
   font-size: 12px;
-  z-index: 99;
 }
 
 .status-item {
@@ -309,13 +310,6 @@ html, body {
 .status-item span {
   color: #0066cc;
   font-weight: 600;
-}
-
-/* Main content area (between panels) */
-#container {
-  padding-left: 160px;
-  padding-right: 200px;
-  padding-bottom: 30px;
 }
 
 /* Modal Dialog */

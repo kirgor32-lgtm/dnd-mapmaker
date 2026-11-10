@@ -4,12 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>D&D MapMaker — Редактор Карт и Объектов</title>
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
 <div id="container">
-  <canvas id="canvas"></canvas>
-
   <!-- Top toolbar -->
   <div id="toolbar" class="toolbar">
     <div class="toolbar-group">
@@ -42,45 +40,49 @@
     </div>
   </div>
 
-  <!-- Left sidebar: Terrain brushes -->
-  <aside id="leftPanel" class="left-panel">
-    <div class="panel-header">Террейн</div>
-    <div class="brush-section">
-      <label class="fld">Размер кисти</label>
-      <div class="brush-size-row">
-        <input id="brushSize" type="range" min="5" max="100" value="20">
-        <span id="brushSizeLabel" class="size-label">20</span>
-      </div>
-    </div>
-    <div class="terrain-swatches">
-      <button class="terrain-btn active" data-terrain="grass" title="Трава">🌱 Трава</button>
-      <button class="terrain-btn" data-terrain="forest" title="Лес">🌲 Лес</button>
-      <button class="terrain-btn" data-terrain="mountain" title="Гора">⛰️ Гора</button>
-      <button class="terrain-btn" data-terrain="water" title="Вода">💧 Вода</button>
-      <button class="terrain-btn" data-terrain="sand" title="Песок">🏜️ Песок</button>
-      <button class="terrain-btn" data-terrain="snow" title="Снег">❄️ Снег</button>
-      <button class="terrain-btn" data-terrain="swamp" title="Болото">🪨 Болото</button>
-      <button class="terrain-btn" data-terrain="road" title="Дорога">🛣️ Дорога</button>
-      <button class="terrain-btn" data-terrain="dungeon" title="Камень">🧱 Камень</button>
-      <button class="terrain-btn" data-terrain="wall" title="Стена">🚪 Стена</button>
-    </div>
-  </aside>
+  <div id="mainArea">
+    <canvas id="canvas"></canvas>
 
-  <!-- Right sidebar: Props palette -->
-  <aside id="rightPanel" class="right-panel">
-    <div class="panel-header">Объекты и Постройки</div>
-    <div class="palette-controls">
-      <input id="propFilter" type="text" placeholder="Поиск..." class="filter-box">
-    </div>
-    <div class="palette-tabs">
-      <button class="palette-tab active" data-tab="town">Город</button>
-      <button class="palette-tab" data-tab="dungeon">Подземелье</button>
-      <button class="palette-tab" data-tab="nature">Природа</button>
-    </div>
-    <div id="propPalette" class="prop-palette">
-      <!-- Динамически заполняется JS -->
-    </div>
-  </aside>
+    <!-- Left sidebar: Terrain brushes -->
+    <aside id="leftPanel" class="left-panel">
+      <div class="panel-header">Террейн</div>
+      <div class="brush-section">
+        <label class="fld">Размер кисти</label>
+        <div class="brush-size-row">
+          <input id="brushSize" type="range" min="5" max="100" value="20">
+          <span id="brushSizeLabel" class="size-label">20</span>
+        </div>
+      </div>
+      <div class="terrain-swatches">
+        <button class="terrain-btn active" data-terrain="grass" title="Трава">🌱 Трава</button>
+        <button class="terrain-btn" data-terrain="forest" title="Лес">🌲 Лес</button>
+        <button class="terrain-btn" data-terrain="mountain" title="Гора">⛰️ Гора</button>
+        <button class="terrain-btn" data-terrain="water" title="Вода">💧 Вода</button>
+        <button class="terrain-btn" data-terrain="sand" title="Песок">🏜️ Песок</button>
+        <button class="terrain-btn" data-terrain="snow" title="Снег">❄️ Снег</button>
+        <button class="terrain-btn" data-terrain="swamp" title="Болото">🪨 Болото</button>
+        <button class="terrain-btn" data-terrain="road" title="Дорога">🛣️ Дорога</button>
+        <button class="terrain-btn" data-terrain="dungeon" title="Камень">🧱 Камень</button>
+        <button class="terrain-btn" data-terrain="wall" title="Стена">🚪 Стена</button>
+      </div>
+    </aside>
+
+    <!-- Right sidebar: Props palette -->
+    <aside id="rightPanel" class="right-panel">
+      <div class="panel-header">Объекты и Постройки</div>
+      <div class="palette-controls">
+        <input id="propFilter" type="text" placeholder="Поиск..." class="filter-box">
+      </div>
+      <div class="palette-tabs">
+        <button class="palette-tab active" data-tab="town">Город</button>
+        <button class="palette-tab" data-tab="dungeon">Подземелье</button>
+        <button class="palette-tab" data-tab="nature">Природа</button>
+      </div>
+      <div id="propPalette" class="prop-palette">
+        <!-- Динамически заполняется JS -->
+      </div>
+    </aside>
+  </div>
 
   <!-- Bottom status bar -->
   <div id="statusBar" class="status-bar">
@@ -107,6 +109,6 @@
 <!-- File input for loading -->
 <input id="fileInput" type="file" accept=".json" style="display:none;">
 
-<script src="js/app.js?v=10"></script>
+<script src="js/app.js?v=11"></script>
 </body>
 </html>
