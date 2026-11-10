@@ -23,7 +23,8 @@
       <button id="btnRedo" class="btn" title="Повторить (Ctrl+Y)">↷ Повторить</button>
     </div>
     <div class="toolbar-group">
-      <button id="btnSelectTool" class="btn toggle" title="Выбрать/двигать/повернуть/удалить объект">🖱️ Выбрать</button>
+      <button id="btnSelectTool" class="btn toggle" title="Выбрать/двигать/повернуть/удалить объект (точечно или рамкой)">🖱️ Выбрать</button>
+      <button id="btnEraser" class="btn toggle" title="Ластик - стирает рельеф под кистью">🧽 Ластик</button>
       <button id="btnRotate" class="btn" title="Повернуть выбранный объект (R)">↻ Повернуть</button>
       <button id="btnDelete" class="btn" title="Удалить выбранный объект (Del)">🗑️ Удалить</button>
     </div>
@@ -62,7 +63,6 @@
       <button class="terrain-btn" data-terrain="road" title="Дорога">🛣️ Дорога</button>
       <button class="terrain-btn" data-terrain="dungeon" title="Камень">🧱 Камень</button>
       <button class="terrain-btn" data-terrain="wall" title="Стена">🚪 Стена</button>
-      <button id="btnEraser" class="btn toggle" title="Ластик - стирает рельеф под кистью">🧽 Ластик</button>
     </div>
   </aside>
 
@@ -107,6 +107,6 @@
 <!-- File input for loading -->
 <input id="fileInput" type="file" accept=".json" style="display:none;">
 
-<script src="js/app.js?v=9"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>
