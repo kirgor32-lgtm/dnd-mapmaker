@@ -207,267 +207,145 @@
   // Town buildings - detailed top-down views
   // ===== TOWN BUILDINGS - Detailed Top-Down Views =====
   
-  function drawHouseCottage(ctx) {
-    // Крыша с градиентом - красная черепица
-    const roofGrad = ctx.createLinearGradient(0, -12, 0, -6);
-    roofGrad.addColorStop(0, '#d43333');
-    roofGrad.addColorStop(0.5, '#cc1111');
-    roofGrad.addColorStop(1, '#991111');
-    ctx.fillStyle = roofGrad;
+  // ===== TOWN BUILDINGS - Pure Top-Down (Roof-Only) Views =====
+
+  // Общий помощник: двускатная крыша, вид строго сверху.
+  // hw/hh - половина ширины/высоты footprint-а; ridgeDir: 'h' (конёк горизонтальный) или 'v' (вертикальный)
+  function drawGableRoofTop(ctx, hw, hh, ridgeDir, colorLight, colorMid, colorDark) {
+    ctx.save();
+    // Тень от свеса крыши на землю
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath();
-    ctx.moveTo(-10, -6);
-    ctx.quadraticCurveTo(0, -14, 10, -6);
-    ctx.lineTo(9, -5);
-    ctx.quadraticCurveTo(0, -11, -9, -5);
+    ctx.roundRect ? ctx.roundRect(-hw + 1.5, -hh + 2.5, hw * 2, hh * 2, 1) : ctx.rect(-hw + 1.5, -hh + 2.5, hw * 2, hh * 2);
     ctx.fill();
-    
-    // Тень крыши
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    ctx.beginPath();
-    ctx.moveTo(-9, -5);
-    ctx.lineTo(9, -5);
-    ctx.lineTo(8, -4);
-    ctx.lineTo(-8, -4);
-    ctx.fill();
-    
-    // Стены - камень/кирпич с градиентом
-    const wallGrad = ctx.createLinearGradient(-8, -4, 8, 6);
-    wallGrad.addColorStop(0, '#c9a876');
-    wallGrad.addColorStop(0.5, '#deb89b');
-    wallGrad.addColorStop(1, '#c9a876');
-    ctx.fillStyle = wallGrad;
-    ctx.fillRect(-9, -4, 18, 10);
-    
-    // Контур стен
-    ctx.strokeStyle = '#8b7355';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-9, -4, 18, 10);
-    
-    // Текстура кирпичей
-    ctx.fillStyle = 'rgba(0,0,0,0.08)';
-    for (let i = -8; i <= 8; i += 6) {
-      ctx.fillRect(i, -2, 5, 1);
-      ctx.fillRect(i, 2, 5, 1);
-    }
-    
-    // Дверь
-    ctx.fillStyle = '#5c3a1f';
-    ctx.fillRect(-2, 2, 4, 5);
-    ctx.fillStyle = '#f4a460';
-    ctx.fillRect(-0.5, 3.5, 1, 1.5);
-    
-    // Окна
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(-6, -1, 3, 2.5);
-    ctx.fillRect(3, -1, 3, 2.5);
-    ctx.fillStyle = '#4a90e2';
-    ctx.fillRect(-5.5, -0.5, 1.5, 1.5);
-    ctx.fillRect(3.5, -0.5, 1.5, 1.5);
-  }
-  
-  function drawHouseStone(ctx) {
-    // Крыша - серо-синяя черепица
-    const roofGrad = ctx.createLinearGradient(0, -14, 0, -6);
-    roofGrad.addColorStop(0, '#5a7c8d');
-    roofGrad.addColorStop(0.5, '#4a5c6f');
-    roofGrad.addColorStop(1, '#2a3c4f');
-    ctx.fillStyle = roofGrad;
-    ctx.beginPath();
-    ctx.moveTo(-11, -7);
-    ctx.quadraticCurveTo(0, -15, 11, -7);
-    ctx.lineTo(10, -5);
-    ctx.quadraticCurveTo(0, -12, -10, -5);
-    ctx.fill();
-    
-    // Тень крыши
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath();
-    ctx.moveTo(-10, -5);
-    ctx.lineTo(10, -5);
-    ctx.lineTo(9, -3);
-    ctx.lineTo(-9, -3);
-    ctx.fill();
-    
-    // Каменные стены с градиентом
-    const stoneGrad = ctx.createLinearGradient(-9, -2, 9, 8);
-    stoneGrad.addColorStop(0, '#a0a0a0');
-    stoneGrad.addColorStop(0.5, '#b8b8b8');
-    stoneGrad.addColorStop(1, '#9a9a9a');
-    ctx.fillStyle = stoneGrad;
-    ctx.fillRect(-10, -3, 20, 11);
-    
-    // Контур
-    ctx.strokeStyle = '#6a6a6a';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-10, -3, 20, 11);
-    
-    // Кладка камней
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    ctx.lineWidth = 0.5;
-    for (let i = -8; i <= 8; i += 7) {
+
+    if (ridgeDir === 'h') {
+      const g1 = ctx.createLinearGradient(0, -hh, 0, 0);
+      g1.addColorStop(0, colorLight);
+      g1.addColorStop(1, colorMid);
+      ctx.fillStyle = g1;
       ctx.beginPath();
-      ctx.moveTo(i, -2);
-      ctx.lineTo(i + 6, -2);
-      ctx.stroke();
-    }
-    for (let j = 0; j <= 8; j += 3) {
+      ctx.moveTo(-hw, -hh); ctx.lineTo(hw, -hh); ctx.lineTo(hw, 0); ctx.lineTo(-hw, 0);
+      ctx.closePath(); ctx.fill();
+
+      const g2 = ctx.createLinearGradient(0, 0, 0, hh);
+      g2.addColorStop(0, colorMid);
+      g2.addColorStop(1, colorDark);
+      ctx.fillStyle = g2;
       ctx.beginPath();
-      ctx.moveTo(-10, j);
-      ctx.lineTo(10, j);
-      ctx.stroke();
-    }
-    
-    // Двери и окна
-    ctx.fillStyle = '#3a3a3a';
-    ctx.fillRect(-3, 1, 6, 6);
-    ctx.fillStyle = '#5a7c8d';
-    ctx.fillRect(-2, 2, 2.5, 2);
-    ctx.fillRect(1.5, 2, 2.5, 2);
-  }
-  
-  function drawHouseTimber(ctx) {
-    // Крыша - тёмная
-    ctx.fillStyle = '#8b6f47';
-    ctx.beginPath();
-    ctx.moveTo(-10, -7);
-    ctx.lineTo(0, -13);
-    ctx.lineTo(10, -7);
-    ctx.fill();
-    
-    // Шинглы на крыше
-    ctx.fillStyle = '#6b5340';
-    for (let i = -10; i <= 10; i += 4) {
-      for (let j = -11; j <= -7; j += 2) {
-        ctx.beginPath();
-        ctx.arc(i + 2, j, 1.5, 0, Math.PI * 2);
-        ctx.fill();
+      ctx.moveTo(-hw, 0); ctx.lineTo(hw, 0); ctx.lineTo(hw, hh); ctx.lineTo(-hw, hh);
+      ctx.closePath(); ctx.fill();
+
+      // конёк
+      ctx.strokeStyle = colorDark;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(-hw, 0); ctx.lineTo(hw, 0); ctx.stroke();
+      // ряды черепицы/досок
+      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = 0.6;
+      for (let y = -hh + 2; y < hh; y += 3) {
+        if (Math.abs(y) < 0.8) continue;
+        ctx.beginPath(); ctx.moveTo(-hw, y); ctx.lineTo(hw, y); ctx.stroke();
+      }
+    } else {
+      const g1 = ctx.createLinearGradient(-hw, 0, 0, 0);
+      g1.addColorStop(0, colorMid);
+      g1.addColorStop(1, colorLight);
+      ctx.fillStyle = g1;
+      ctx.beginPath();
+      ctx.moveTo(-hw, -hh); ctx.lineTo(0, -hh); ctx.lineTo(0, hh); ctx.lineTo(-hw, hh);
+      ctx.closePath(); ctx.fill();
+
+      const g2 = ctx.createLinearGradient(0, 0, hw, 0);
+      g2.addColorStop(0, colorMid);
+      g2.addColorStop(1, colorDark);
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.moveTo(0, -hh); ctx.lineTo(hw, -hh); ctx.lineTo(hw, hh); ctx.lineTo(0, hh);
+      ctx.closePath(); ctx.fill();
+
+      ctx.strokeStyle = colorDark;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, -hh); ctx.lineTo(0, hh); ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = 0.6;
+      for (let x = -hw + 2; x < hw; x += 3) {
+        if (Math.abs(x) < 0.8) continue;
+        ctx.beginPath(); ctx.moveTo(x, -hh); ctx.lineTo(x, hh); ctx.stroke();
       }
     }
-    
-    // Стены - светлое дерево с градиентом
-    const woodGrad = ctx.createLinearGradient(-8, -5, 8, 7);
-    woodGrad.addColorStop(0, '#d4b499');
-    woodGrad.addColorStop(0.5, '#e8c9a8');
-    woodGrad.addColorStop(1, '#d4b499');
-    ctx.fillStyle = woodGrad;
-    ctx.fillRect(-9, -5, 18, 12);
-    
-    // Балки - горизонтальные и вертикальные
-    ctx.strokeStyle = '#8b4513';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-9, 0);
-    ctx.lineTo(9, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, -5);
-    ctx.lineTo(0, 7);
-    ctx.stroke();
-    
-    // Дверь
-    ctx.fillStyle = '#5c3a1f';
-    ctx.fillRect(-2.5, 3, 5, 4);
-    ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-1, 4.5, 2, 1.5);
+    // контур свеса
+    ctx.strokeStyle = colorDark;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-hw, -hh, hw * 2, hh * 2);
+    ctx.restore();
   }
-  
+
+  function drawChimney(ctx, x, y) {
+    ctx.fillStyle = '#5c4a3c';
+    ctx.fillRect(x - 1.2, y - 1.2, 2.4, 2.4);
+    ctx.strokeStyle = '#3a2e24';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(x - 1.2, y - 1.2, 2.4, 2.4);
+  }
+
+  function drawDoorNotch(ctx, x, y, horizontal) {
+    // Небольшой проём/дорожка у входа - виден как светлая плитка у края крыши
+    ctx.fillStyle = '#9c8564';
+    if (horizontal) ctx.fillRect(x - 1.5, y - 0.8, 3, 1.6);
+    else ctx.fillRect(x - 0.8, y - 1.5, 1.6, 3);
+  }
+
+  function drawHouseCottage(ctx) {
+    // Дом (коттедж) - черепичная двускатная крыша, конёк вдоль Y
+    drawGableRoofTop(ctx, 9, 6, 'v', '#e05a4a', '#c23a2d', '#8c2419');
+    drawChimney(ctx, 5, -4);
+    drawDoorNotch(ctx, 0, 6, true);
+  }
+
+  function drawHouseStone(ctx) {
+    // Дом (камень) - серо-синяя шиферная крыша, конёк вдоль X
+    drawGableRoofTop(ctx, 10, 7, 'h', '#7d99a8', '#536b7a', '#2e4350');
+    drawChimney(ctx, -6, -5);
+    drawDoorNotch(ctx, 0, 7, true);
+  }
+
+  function drawHouseTimber(ctx) {
+    // Дом (брус) - коричневая деревянная крыша с конёк по Y
+    drawGableRoofTop(ctx, 9, 6, 'v', '#b08552', '#8b6239', '#5c3f22');
+    drawDoorNotch(ctx, 0, 6, true);
+  }
+
   function drawHouseTall(ctx) {
-    // Высокий красный дом с четырёхскатной крышей
-    const roofGrad = ctx.createLinearGradient(0, -15, 0, -6);
-    roofGrad.addColorStop(0, '#ff4444');
-    roofGrad.addColorStop(0.5, '#dd2222');
-    roofGrad.addColorStop(1, '#aa1111');
-    ctx.fillStyle = roofGrad;
-    ctx.beginPath();
-    ctx.moveTo(-9, -8);
-    ctx.lineTo(0, -16);
-    ctx.lineTo(9, -8);
-    ctx.lineTo(8, -6);
-    ctx.quadraticCurveTo(0, -12, -8, -6);
-    ctx.fill();
-    
-    // Стены с окнами
-    const wallGrad = ctx.createLinearGradient(-8, -4, 8, 6);
-    wallGrad.addColorStop(0, '#deb89b');
-    wallGrad.addColorStop(1, '#c9a876');
-    ctx.fillStyle = wallGrad;
-    ctx.fillRect(-8, -4, 16, 14);
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-8, -4, 16, 14);
-    
-    // Окна - 2x2
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(-5, -2, 3, 3);
-    ctx.fillRect(2, -2, 3, 3);
-    ctx.fillRect(-5, 3, 3, 3);
-    ctx.fillRect(2, 3, 3, 3);
-    
-    // Отражения в окнах
-    ctx.fillStyle = '#4a90e2';
-    ctx.fillRect(-4.5, -1, 1, 1);
-    ctx.fillRect(2.5, -1, 1, 1);
+    // Высокий дом - крупная ярко-красная крыша
+    drawGableRoofTop(ctx, 8, 9, 'h', '#ff5c4c', '#d5362a', '#8f1f16');
+    drawChimney(ctx, 5, -7);
+    drawDoorNotch(ctx, 0, 9, true);
   }
-  
+
   function drawHouseSmall(ctx) {
-    // Маленький коттедж
-    const roofGrad = ctx.createLinearGradient(0, -8, 0, -4);
-    roofGrad.addColorStop(0, '#b83333');
-    roofGrad.addColorStop(1, '#8a1111');
-    ctx.fillStyle = roofGrad;
-    ctx.beginPath();
-    ctx.moveTo(-7, -4);
-    ctx.lineTo(0, -9);
-    ctx.lineTo(7, -4);
-    ctx.fill();
-    
-    const wallGrad = ctx.createLinearGradient(-6, -3, 6, 5);
-    wallGrad.addColorStop(0, '#d4a574');
-    wallGrad.addColorStop(1, '#c9a876');
-    ctx.fillStyle = wallGrad;
-    ctx.fillRect(-7, -3, 14, 8);
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-7, -3, 14, 8);
-    
-    // Дверь и окно
-    ctx.fillStyle = '#3a2a1a';
-    ctx.fillRect(-1.5, 1, 3, 3);
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(3, 0, 2, 2);
+    // Маленький дом - компактная крыша
+    drawGableRoofTop(ctx, 6, 5, 'v', '#c2634e', '#9c4332', '#6b2b1f');
+    drawDoorNotch(ctx, 0, 5, true);
   }
-  
+
   function drawHouseWithFence(ctx) {
-    // Дом с забором
-    ctx.fillStyle = '#cc3333';
-    ctx.beginPath();
-    ctx.moveTo(-8, -5);
-    ctx.lineTo(0, -11);
-    ctx.lineTo(8, -5);
-    ctx.fill();
-    
-    ctx.fillStyle = '#d4a574';
-    ctx.fillRect(-8, -4, 16, 10);
+    // Дом с забором - крыша + видимый сверху участок с изгородью по периметру
+    drawGableRoofTop(ctx, 8, 6, 'v', '#e05a4a', '#c23a2d', '#8c2419');
+    drawChimney(ctx, 4, -4);
+    drawDoorNotch(ctx, 0, 6, true);
+    // Изгородь по контуру участка (видна сверху как тонкая линия с кольями)
     ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-8, -4, 16, 10);
-    
-    // Дверь
-    ctx.fillStyle = '#5c3a1f';
-    ctx.fillRect(-2, 2, 4, 3);
-    
-    // Забор - снизу
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(-14, 6);
-    ctx.lineTo(14, 6);
-    ctx.stroke();
-    
-    // Штакетины
-    for (let i = -12; i <= 12; i += 4) {
-      ctx.fillStyle = '#a0826d';
-      ctx.fillRect(i, 4, 2, 3);
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(-14, -10, 28, 20);
+    ctx.fillStyle = '#a0826d';
+    for (let x = -13; x <= 13; x += 4) {
+      ctx.fillRect(x - 0.5, -10.5, 1, 1.2);
+      ctx.fillRect(x - 0.5, 9.3, 1, 1.2);
+    }
+    for (let y = -9; y <= 9; y += 4) {
+      ctx.fillRect(-14.5, y - 0.5, 1.2, 1);
+      ctx.fillRect(13.3, y - 0.5, 1.2, 1);
     }
   }
   
@@ -611,49 +489,36 @@
   }
   
   function drawForge(ctx) {
-    // Кузница: приземистое каменное здание с дымовой трубой и наковальней
-    const wallGrad = ctx.createLinearGradient(-10, -8, 10, 8);
-    wallGrad.addColorStop(0, '#8a7262');
-    wallGrad.addColorStop(1, '#5c4a3c');
-    ctx.fillStyle = wallGrad;
-    ctx.beginPath();
-    ctx.moveTo(-10, -4);
-    ctx.lineTo(-10, 9);
-    ctx.lineTo(10, 9);
-    ctx.lineTo(10, -4);
-    ctx.lineTo(0, -10);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#3a2e24';
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
+    // Кузница: крыша сверху (вид строго сверху) + дымоход, горн и наковальня во дворе
+    drawGableRoofTop(ctx, 8, 6, 'h', '#7a6a5c', '#564738', '#332a20');
+    drawDoorNotch(ctx, 0, 6, true);
 
     // Дымовая труба с дымом
     ctx.fillStyle = '#4a3c30';
-    ctx.fillRect(5, -16, 4, 8);
+    ctx.fillRect(5, -9, 4, 3.5);
     ctx.fillStyle = 'rgba(120,120,120,0.5)';
     ctx.beginPath();
-    ctx.arc(7, -19, 2.5, 0, Math.PI * 2);
-    ctx.arc(9, -23, 3, 0, Math.PI * 2);
-    ctx.arc(6, -25, 2.2, 0, Math.PI * 2);
+    ctx.arc(7, -11, 2, 0, Math.PI * 2);
+    ctx.arc(9, -14, 2.4, 0, Math.PI * 2);
+    ctx.arc(6, -17, 1.8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Открытый горн со свечением
+    // Открытый горн со свечением (во дворе, виден сверху)
     ctx.fillStyle = '#2a2420';
-    ctx.fillRect(-7, 0, 6, 7);
-    const fireGrad = ctx.createRadialGradient(-4, 3, 0, -4, 3, 3.5);
+    ctx.fillRect(-11, 2, 6, 6);
+    const fireGrad = ctx.createRadialGradient(-8, 5, 0, -8, 5, 3);
     fireGrad.addColorStop(0, '#ffdd55');
     fireGrad.addColorStop(0.5, '#ff6a1f');
     fireGrad.addColorStop(1, 'rgba(255,60,0,0)');
     ctx.fillStyle = fireGrad;
     ctx.beginPath();
-    ctx.arc(-4, 3, 3.5, 0, Math.PI * 2);
+    ctx.arc(-8, 5, 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // Наковальня у входа
+    // Наковальня во дворе
     ctx.fillStyle = '#2f2f2f';
-    ctx.fillRect(2, 6, 6, 2);
-    ctx.fillRect(4, 4, 2, 2);
+    ctx.fillRect(4, 7, 6, 2.2);
+    ctx.fillRect(6, 4.5, 2, 2.2);
   }
   
   function drawCityWall(ctx) {
@@ -788,27 +653,16 @@
   }
   
   function drawTavern(ctx) {
-    // Таверна - дом с вывеской
-    ctx.fillStyle = '#8b4513';
-    ctx.beginPath();
-    ctx.moveTo(-9, -6);
-    ctx.lineTo(0, -12);
-    ctx.lineTo(9, -6);
-    ctx.fill();
-    
-    ctx.fillStyle = '#d9b99f';
-    ctx.fillRect(-9, -4, 18, 11);
-    ctx.strokeStyle = '#8b6f47';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-9, -4, 18, 11);
-    
-    // Дверь с табличкой
-    ctx.fillStyle = '#5c3a1f';
-    ctx.fillRect(-2, 2, 4, 5);
-    
-    // Вывеска сверху
+    // Таверна - крыша с вывеской и дымоходом, вид сверху
+    drawGableRoofTop(ctx, 9, 7, 'v', '#c87a3e', '#9c5826', '#6b3a18');
+    drawChimney(ctx, -6, -5);
+    drawDoorNotch(ctx, 0, 7, true);
+    // Вывеска на кронштейне у входа
     ctx.fillStyle = '#cc3333';
-    ctx.fillRect(-4, -7, 8, 2);
+    ctx.fillRect(-5, 8.5, 5, 2.2);
+    ctx.strokeStyle = '#3a2a1a';
+    ctx.lineWidth = 0.6;
+    ctx.strokeRect(-5, 8.5, 5, 2.2);
   }
   
   function drawWindmill(ctx) {
@@ -848,24 +702,26 @@
   }
   
   function drawFarm(ctx) {
-    // Ферма - сарай + огород
-    ctx.fillStyle = '#cc3333';
-    ctx.beginPath();
-    ctx.moveTo(-8, -5);
-    ctx.lineTo(0, -11);
-    ctx.lineTo(8, -5);
-    ctx.fill();
-    
-    ctx.fillStyle = '#e8c9a8';
-    ctx.fillRect(-8, -4, 16, 10);
-    
-    // Огород сбоку
-    ctx.strokeStyle = '#6b5340';
+    // Ферма - сарай (вид сверху: только крыша) + огород рядом
+    drawGableRoofTop(ctx, 8, 6, 'v', '#d5564a', '#a93a2f', '#6e241c');
+    drawDoorNotch(ctx, 0, 6, true);
+    // Огород сбоку - ряды грядок
+    ctx.fillStyle = '#5c4a32';
+    ctx.fillRect(10, -6, 10, 12);
+    ctx.strokeStyle = '#3e3120';
     ctx.lineWidth = 0.5;
-    for (let i = -6; i <= 6; i += 2) {
-      for (let j = 2; j <= 6; j += 2) {
-        ctx.fillStyle = '#4db876';
-        ctx.fillRect(i + 6, j, 1.5, 1.5);
+    for (let j = -5; j <= 5; j += 3) {
+      ctx.beginPath();
+      ctx.moveTo(10, j);
+      ctx.lineTo(20, j);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#4db876';
+    for (let i = 11; i <= 19; i += 3) {
+      for (let j = -5; j <= 5; j += 3) {
+        ctx.beginPath();
+        ctx.arc(i, j, 0.8, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
   }
@@ -1226,62 +1082,76 @@
   // ===== NATURE PROPS - Organic, Green, Water, Rocks =====
   
   function drawTreeDeciduous(ctx) {
-    // Лиственное дерево - круглая крона со стволом
-    // Ствол
-    ctx.fillStyle = '#5c4a2f';
-    ctx.fillRect(-1.5, 0, 3, 8);
-    ctx.fillStyle = '#4a3a1f';
-    ctx.fillRect(-1, 1, 2, 6);
-    
-    // Крона - многослойная
-    const treeGrad = ctx.createRadialGradient(0, -4, 2, 0, -4, 10);
-    treeGrad.addColorStop(0, '#3db347');
-    treeGrad.addColorStop(0.6, '#2d8a3a');
-    treeGrad.addColorStop(1, '#1d5a2a');
+    // Лиственное дерево - вид строго сверху: округлая крона, ствол скрыт под кроной
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(0.8, 1, 8, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const treeGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, 9);
+    treeGrad.addColorStop(0, '#5ed16a');
+    treeGrad.addColorStop(0.55, '#2d8a3a');
+    treeGrad.addColorStop(1, '#17421f');
     ctx.fillStyle = treeGrad;
     ctx.beginPath();
-    ctx.arc(0, -4, 9, 0, Math.PI * 2);
+    // неровный контур кроны (несколько перекрывающихся лепестков листвы)
+    ctx.arc(0, 0, 8.5, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Верхний слой кроны - светлее
-    ctx.fillStyle = '#4db876';
     ctx.beginPath();
-    ctx.arc(0, -5, 7, 0, Math.PI * 2);
+    ctx.arc(-4, -3, 4, 0, Math.PI * 2);
+    ctx.arc(4, -3, 4, 0, Math.PI * 2);
+    ctx.arc(-4, 4, 4, 0, Math.PI * 2);
+    ctx.arc(4, 4, 4, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Свет сверху
-    ctx.fillStyle = 'rgba(200, 255, 200, 0.3)';
+
+    // пятна светотени для объёма листвы
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
     ctx.beginPath();
-    ctx.arc(-2, -8, 4, 0, Math.PI * 2);
+    ctx.arc(-3, -3, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.arc(3, 4, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // тень ствола в центре (виден только намёк, т.к. скрыт кроной)
+    ctx.fillStyle = 'rgba(30,20,10,0.5)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 1.3, 0, Math.PI * 2);
     ctx.fill();
   }
-  
+
   function drawTreePine(ctx) {
-    // Хвойное дерево - остроконечное
-    // Ствол
-    ctx.fillStyle = '#6b5340';
-    ctx.fillRect(-1, 2, 2, 6);
-    
-    // Конус хвои - 3 уровня
-    ctx.fillStyle = '#1d4d2a';
+    // Хвойное дерево - вид строго сверху: звездчатая/зубчатая крона
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath();
-    ctx.moveTo(0, -9);
-    ctx.lineTo(8, 1);
-    ctx.lineTo(-8, 1);
+    ctx.ellipse(0.8, 1, 7.5, 6.5, 0, 0, Math.PI * 2);
     ctx.fill();
-    
-    ctx.fillStyle = '#2d5c3a';
+
+    const needleGrad = ctx.createRadialGradient(-1, -1, 1, 0, 0, 8.5);
+    needleGrad.addColorStop(0, '#3d7c4a');
+    needleGrad.addColorStop(0.6, '#1d4d2a');
+    needleGrad.addColorStop(1, '#0e2e16');
+    ctx.fillStyle = needleGrad;
     ctx.beginPath();
-    ctx.moveTo(0, -4);
-    ctx.lineTo(7, 4);
-    ctx.lineTo(-7, 4);
+    const spikes = 8;
+    for (let i = 0; i < spikes; i++) {
+      const a1 = (i / spikes) * Math.PI * 2;
+      const a2 = ((i + 0.5) / spikes) * Math.PI * 2;
+      const rOuter = 8.5;
+      const rInner = 5.5;
+      ctx.lineTo(Math.cos(a1) * rOuter, Math.sin(a1) * rOuter);
+      ctx.lineTo(Math.cos(a2) * rInner, Math.sin(a2) * rInner);
+    }
+    ctx.closePath();
     ctx.fill();
-    
-    ctx.fillStyle = '#3d7c4a';
+    ctx.strokeStyle = '#0e2e16';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(30,20,10,0.5)';
     ctx.beginPath();
-    ctx.moveTo(0, 1);
-    ctx.lineTo(6, 8);
-    ctx.lineTo(-6, 8);
+    ctx.arc(0, 0, 1.1, 0, Math.PI * 2);
     ctx.fill();
   }
   
